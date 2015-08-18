@@ -3,6 +3,9 @@
 #include "GameOptions.hpp"
 #include "CGlobals.hpp"
 #include "CollisionHandler.hpp"
+#include "CMessageBroadcaster.hpp"
+
+CLevel * CLevel::smCurrentLevel = NULL;
 
 float wallSize = 50.0f;
 
@@ -47,6 +50,10 @@ void CLevel::Enter()
     
     CRayGame::Get()->SetGameState(kGameStateInGame);
     
+    CMessageBroadcaster<CEvent>::Subscribe(mTorch);
+    
+    smCurrentLevel = this;
+    
     StartLevel();
 }
 
@@ -56,6 +63,10 @@ void CLevel::Exit()
     CRayGame::Get()->UnregisterRenderable(this);
     
     CRayGame::Get()->UnsetGameState(kGameStateInGame);
+    
+    CMessageBroadcaster<CEvent>::Unsubscribe(mTorch);
+    
+    smCurrentLevel = NULL;
 }
 
 void CLevel::StartLevel()
@@ -81,8 +92,27 @@ void CLevel::Draw(CWindow *theWindow)
     {
         p->Draw(theWindow);
     }
+    
+    // Draw the darkness over the level but make sure the player and torch are visible
+    mTorch->DrawDarkness(theWindow);
+    
     mPlayer->Draw(theWindow);
     mTorch->Draw(theWindow);
+}
+
+std::list<CConvexShape> CLevel::GetOccluders()
+{
+    std::list<CConvexShape> occluders;
+    for (auto p: mPlatforms)
+    {
+        occluders.push_back(p->GetHitbox());
+    }
+    return occluders;
+}
+
+CLevel * CLevel::GetCurrent()
+{
+    return smCurrentLevel;
 }
 
 void CLevel::HandleCollisions()

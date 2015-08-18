@@ -13,7 +13,7 @@ CRayGame::CRayGame() : CGame("DeathMatchGame")
 
 void CRayGame::InitialiseOptions()
 {
-    GameOptions::antiAliasingLevel = 0;
+    GameOptions::antiAliasingLevel = 4;
 }
 
 void CRayGame::GoToLocation(int theLocation, std::string filename)

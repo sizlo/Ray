@@ -21,12 +21,18 @@ public:
     void Enter();
     void Exit();
     
+    std::list<CConvexShape> GetOccluders();
+    
+    static CLevel * GetCurrent();
+    
 private:
     void HandleCollisions();
     
     std::list<CPlatform *> mPlatforms;
     CPlayer *mPlayer;
     CTorch *mTorch;
+    
+    static CLevel *smCurrentLevel;
 };
 
 #endif // __Ray__CLevel__
