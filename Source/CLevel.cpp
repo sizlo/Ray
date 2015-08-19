@@ -110,6 +110,11 @@ std::list<CConvexShape> CLevel::GetOccluders()
     return occluders;
 }
 
+std::list<CPlatform *> CLevel::GetPlatforms()
+{
+    return mPlatforms;
+}
+
 CLevel * CLevel::GetCurrent()
 {
     return smCurrentLevel;

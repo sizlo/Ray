@@ -22,6 +22,7 @@ public:
     void Exit();
     
     std::list<CConvexShape> GetOccluders();
+    std::list<CPlatform *> GetPlatforms();
     
     static CLevel * GetCurrent();
     

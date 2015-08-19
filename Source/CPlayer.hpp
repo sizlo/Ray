@@ -8,7 +8,8 @@ enum EPlayerState
 {
     kGrounded,
     kInAir,
-    kOnWall
+    kOnWall,
+    kStateCount
 };
 
 class CPlayer : public CUpdateable, public CRenderable
@@ -27,8 +28,16 @@ public:
     CVector2f GetMidPoint();
     
 private:
+    bool IsGroundBeneathUs();
+    void AssignCorrectState();
+    void DoHorizontalMovement(CTime elapsedTime);
+    
     CConvexShape mShape;
-    float mMoveSpeed;
+    EPlayerState mState;
+    float mTopHSpeed[kStateCount];
+    float mHAcceleration[kStateCount];
+    float mHSpeed;
+    float mVSpeed;
 };
 
 #endif // __Ray__CPlayer__
