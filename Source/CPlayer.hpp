@@ -3,6 +3,8 @@
 
 #include "CUpdateable.hpp"
 #include "CRenderable.hpp"
+#include "CMessageListener.hpp"
+#include "CPlatform.hpp"
 
 enum EPlayerState
 {
@@ -12,7 +14,7 @@ enum EPlayerState
     kStateCount
 };
 
-class CPlayer : public CUpdateable, public CRenderable
+class CPlayer : public CUpdateable, public CRenderable, public CMessageListener<CEvent>
 {
 public:
     CPlayer();
@@ -22,22 +24,32 @@ public:
     
     void Update(CTime elapsedTime);
     void Draw(CWindow *theWindow);
+    void DrawDebugText(CWindow *theWindow);
+    
+    bool HandleMessage(CEvent e);
     
     CConvexShape & GetHitbox();
     CVector2f GetPosition();
     CVector2f GetMidPoint();
     
+    void ReactToCollisionWith(CPlatform *platform, CVector2f cv);
+    
 private:
     bool IsGroundBeneathUs();
-    void AssignCorrectState();
+    void UpdateState();
+    void TryStartJump();
+    void ResetJumps();
     void DoHorizontalMovement(CTime elapsedTime);
+    void DoVerticalMovement(CTime elapsedTime);
     
     CConvexShape mShape;
     EPlayerState mState;
     float mTopHSpeed[kStateCount];
     float mHAcceleration[kStateCount];
+    float mInitialJumpSpeed;
     float mHSpeed;
     float mVSpeed;
+    int mJumpsLeft;
 };
 
 #endif // __Ray__CPlayer__

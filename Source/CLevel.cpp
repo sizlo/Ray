@@ -51,6 +51,7 @@ void CLevel::Enter()
     CRayGame::Get()->SetGameState(kGameStateInGame);
     
     CMessageBroadcaster<CEvent>::Subscribe(mTorch);
+    CMessageBroadcaster<CEvent>::Subscribe(mPlayer);
     
     smCurrentLevel = this;
     
@@ -65,6 +66,7 @@ void CLevel::Exit()
     CRayGame::Get()->UnsetGameState(kGameStateInGame);
     
     CMessageBroadcaster<CEvent>::Unsubscribe(mTorch);
+    CMessageBroadcaster<CEvent>::Unsubscribe(mPlayer);
     
     smCurrentLevel = NULL;
 }
@@ -127,7 +129,7 @@ void CLevel::HandleCollisions()
         CVector2f cv;
         if (CollisionHandler::AreColliding(mPlayer->GetHitbox(), p->GetHitbox(), &cv))
         {
-            CollisionHandler::Seperate(mPlayer->GetHitbox(), p->GetHitbox(), cv, kCRMoveLeft);
+            mPlayer->ReactToCollisionWith(p, cv);
         }
     }
 }

@@ -2,6 +2,7 @@
 #include "CGlobals.hpp"
 #include "CLevel.hpp"
 #include "CollisionHandler.hpp"
+#include "SystemUtilities.hpp"
 
 CVector2f upDir = CVector2f(0.0f, -1.0f);
 CVector2f downDir = CVector2f(0.0f, 1.0f);
@@ -21,6 +22,8 @@ CPlayer::CPlayer()
     mHAcceleration[kGrounded] = mTopHSpeed[kGrounded] * 5.0f;
     mHAcceleration[kInAir] = mHAcceleration[kGrounded] / 2.0f;
     mHAcceleration[kOnWall] = 0.0f;
+    
+    mInitialJumpSpeed = 1100.0f;
 }
 
 CPlayer::~CPlayer()
@@ -33,7 +36,11 @@ void CPlayer::Init(CVector2f startPos)
     mHSpeed = 0.0f;
     mVSpeed = 0.0f;
     mShape.setPosition(startPos);
-    AssignCorrectState();
+    
+    mState = kGrounded;
+    ResetJumps();
+    
+    UpdateState();
 }
 
 void CPlayer::Update(CTime elapsedTime)
@@ -44,6 +51,8 @@ void CPlayer::Update(CTime elapsedTime)
             DoHorizontalMovement(elapsedTime);
             break;
         case kInAir:
+            DoHorizontalMovement(elapsedTime);
+            DoVerticalMovement(elapsedTime);
             break;
         case kOnWall:
             break;
@@ -51,16 +60,57 @@ void CPlayer::Update(CTime elapsedTime)
             break;
     }
     
-    AssignCorrectState();
+    UpdateState();
 }
 
 void CPlayer::Draw(CWindow *theWindow)
 {
     theWindow->DrawShape(mShape);
     
-    char buffer[32];
-    sprintf(buffer, "mHSpeed: %f", mHSpeed);
+#if TGL_DEBUG
+    DrawDebugText(theWindow);
+#endif
+}
+
+void CPlayer::DrawDebugText(CWindow *theWindow)
+{
+    std::string stateString;
+    switch (mState)
+    {
+        case kGrounded: stateString = "Grounded"; break;
+        case kInAir: stateString = "In Air"; break;
+        case kOnWall: stateString = "On Wall"; break;
+        default: stateString = "Unknown"; break;
+    }
+    char buffer[1024];
+    sprintf(buffer, "mHSpeed: %f\nmVSpeed: %f\nmState: %s",
+            mHSpeed,
+            mVSpeed,
+            stateString.c_str());
     theWindow->DrawTextAt(buffer, 500.0f, 500.0f, CColour::Black, 24);
+}
+
+bool CPlayer::HandleMessage(CEvent e)
+{
+    bool messageEaten = false;
+    
+    if (e.type == CEvent::KeyPressed)
+    {
+        if (e.key.code == CKeyboard::Space)
+        {
+            messageEaten = true;
+            TryStartJump();
+        }
+#if TGL_DEBUG
+        else if (e.key.code == CKeyboard::LShift)
+        {
+            CVector2f newPos = SystemUtilities::GetMousePosition();
+            Init(newPos);
+        }
+#endif
+    }
+    
+    return messageEaten;
 }
 
 CConvexShape & CPlayer::GetHitbox()
@@ -79,6 +129,29 @@ CVector2f CPlayer::GetMidPoint()
     mid.x += CGlobals::playerSize / 2.0f;
     mid.y += CGlobals::playerSize / 2.0f;
     return mid;
+}
+
+void CPlayer::ReactToCollisionWith(CPlatform *platform, CVector2f cv)
+{
+    // Seperate the player from the platform
+    CollisionHandler::Seperate(mShape, platform->GetHitbox(), cv, kCRMoveLeft);
+    
+    CVector2f direction = cv.GetDirection();
+    if (direction == upDir) // Collided with ground
+    {
+        ResetJumps();
+        mState = kGrounded;
+        mVSpeed = 0.0f;
+    }
+    else if (direction == downDir) // Collided with roof
+    {
+        mVSpeed = 0.0f;
+    }
+    else if (direction == leftDir || direction == rightDir) // Collided with wall
+    {
+        // Will eventually attach to wall, for now keep current state
+        mHSpeed = 0.0f;
+    }
 }
 
 bool CPlayer::IsGroundBeneathUs()
@@ -110,16 +183,29 @@ bool CPlayer::IsGroundBeneathUs()
     return groundBeneathUs;
 }
 
-void CPlayer::AssignCorrectState()
+void CPlayer::UpdateState()
 {
-    if (IsGroundBeneathUs())
-    {
-        mState = kGrounded;
-    }
-    else
+    if (mState == kGrounded && !IsGroundBeneathUs())
     {
         mState = kInAir;
+        // Remove a jump since we fell off a platform
+        mJumpsLeft--;
     }
+}
+
+void CPlayer::TryStartJump()
+{
+    if (mJumpsLeft > 0)
+    {
+        mJumpsLeft--;
+        mVSpeed = -mInitialJumpSpeed;
+        mState = kInAir;
+    }
+}
+
+void CPlayer::ResetJumps()
+{
+    mJumpsLeft = 2;
 }
 
 void CPlayer::DoHorizontalMovement(CTime elapsedTime)
@@ -164,4 +250,10 @@ void CPlayer::DoHorizontalMovement(CTime elapsedTime)
     mHSpeed = std::max(mHSpeed, -mTopHSpeed[mState]);
     mHSpeed = std::min(mHSpeed, mTopHSpeed[mState]);
     mShape.move(mHSpeed * elapsedTime.asSeconds(), 0.0f);
+}
+
+void CPlayer::DoVerticalMovement(CTime elapsedTime)
+{
+    mVSpeed += CGlobals::gravity.y * elapsedTime.asSeconds();
+    mShape.move(0.0f, mVSpeed * elapsedTime.asSeconds());
 }
