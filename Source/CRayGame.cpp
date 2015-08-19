@@ -6,7 +6,7 @@ CRayGame * CRayGame::Get()
     return static_cast<CRayGame *>(CGame::Get());
 }
 
-CRayGame::CRayGame() : CGame("Ray")
+CRayGame::CRayGame() : CGame("Ray v" RAY_VERSION_STRING)
 {
     mClearColour = CColour::White;
 }

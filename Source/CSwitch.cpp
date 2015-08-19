@@ -5,10 +5,8 @@
 CSwitch::CSwitch(CVector2f position)
 {
     float s = CGlobals::switchSize;
-    mOuterShape = CRectangleShape(s, s);
-    mOuterShape.setOrigin(s / 2.0f, s / 2.0f);
-    mInnerShape = CRectangleShape(s / 4.0f, s / 2.0f);
-    mInnerShape.setOrigin(s / 8.0f, s / 4.0f);
+    mOuterShape = CRectangleShape(s, s, true);
+    mInnerShape = CRectangleShape(s / 4.0f, s / 2.0f, true);
     mOuterShape.setPosition(position);
     mInnerShape.setPosition(position);
     mOuterShape.setFillColor(CColour::White);

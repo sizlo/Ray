@@ -76,15 +76,19 @@ bool CLevel::HandleMessage(CEvent e)
 {
     bool messageEaten = false;
     
-#if TGL_DEBUG
     if (e.type == CEvent::KeyPressed)
     {
-        if (e.key.code == CKeyboard::L)
+        if (e.key.code == CKeyboard::R)
+        {
+            StartLevel();
+        }
+#if TGL_DEBUG
+        else if (e.key.code == CKeyboard::L)
         {
             mLightsOn = !mLightsOn;
         }
-    }
 #endif
+    }
     
     return messageEaten;
 }
