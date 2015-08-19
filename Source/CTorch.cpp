@@ -60,11 +60,13 @@ bool CTorch::HandleMessage(CEvent e)
     
     if (e.type == CEvent::KeyPressed)
     {
+#if TGL_DEBUG
         if (e.key.code == CKeyboard::L)
         {
             mLightsOn = !mLightsOn;
             messageEaten = true;
         }
+#endif
     }
     
     return messageEaten;
