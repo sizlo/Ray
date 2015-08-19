@@ -10,9 +10,7 @@ CTorch::CTorch(CPlayer *theHolder)
     mShape = CRectangleShape(mTorchLength, 5.0f);
     mShape.setOrigin(0.0f, 2.5f);
     mShape.setFillColor(CColour::Black);
-    mLightRadius = 30.0f;
-    mLightsOn = false;
-    
+    mLightRadius = 30.0f;    
     mHolder = theHolder;
 }
 
@@ -44,32 +42,12 @@ void CTorch::Draw(CWindow *theWindow)
 
 void CTorch::DrawDarkness(CWindow *theWindow)
 {
-    if (mLightsOn) return;
-    
     std::list<CConvexShape> darknessShapes = GenerateDarkness(theWindow);
     for (auto s: darknessShapes)
     {
         s.setFillColor(CColour::Black);
         theWindow->DrawShape(s);
     }
-}
-
-bool CTorch::HandleMessage(CEvent e)
-{
-    bool messageEaten = false;
-    
-    if (e.type == CEvent::KeyPressed)
-    {
-#if TGL_DEBUG
-        if (e.key.code == CKeyboard::L)
-        {
-            mLightsOn = !mLightsOn;
-            messageEaten = true;
-        }
-#endif
-    }
-    
-    return messageEaten;
 }
 
 std::list<CConvexShape> CTorch::GenerateDarkness(CWindow *theWindow)

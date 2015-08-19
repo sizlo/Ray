@@ -34,6 +34,7 @@ CLevel::CLevel()
     
     mPlayer = new CPlayer();
     mTorch = new CTorch(mPlayer);
+    mSwitch = new CSwitch(CVector2f(GameOptions::viewWidth / 2.0f, wallSize + vSpacing - CGlobals::switchSize));
 }
 
 CLevel::~CLevel()
@@ -50,8 +51,8 @@ void CLevel::Enter()
     
     CRayGame::Get()->SetGameState(kGameStateInGame);
     
-    CMessageBroadcaster<CEvent>::Subscribe(mTorch);
     CMessageBroadcaster<CEvent>::Subscribe(mPlayer);
+    CMessageBroadcaster<CEvent>::Subscribe(this);
     
     smCurrentLevel = this;
     
@@ -65,14 +66,32 @@ void CLevel::Exit()
     
     CRayGame::Get()->UnsetGameState(kGameStateInGame);
     
-    CMessageBroadcaster<CEvent>::Unsubscribe(mTorch);
     CMessageBroadcaster<CEvent>::Unsubscribe(mPlayer);
+    CMessageBroadcaster<CEvent>::Unsubscribe(this);
     
     smCurrentLevel = NULL;
 }
 
+bool CLevel::HandleMessage(CEvent e)
+{
+    bool messageEaten = false;
+    
+#if TGL_DEBUG
+    if (e.type == CEvent::KeyPressed)
+    {
+        if (e.key.code == CKeyboard::L)
+        {
+            mLightsOn = !mLightsOn;
+        }
+    }
+#endif
+    
+    return messageEaten;
+}
+
 void CLevel::StartLevel()
 {
+    mLightsOn = false;
     float playerX = (GameOptions::viewWidth / 2.0f) - (CGlobals::playerSize / 2.0f);
     float playerY = GameOptions::viewHeight - wallSize - CGlobals::playerSize;
     mPlayer->Init(CVector2f(playerX, playerY));
@@ -95,8 +114,13 @@ void CLevel::Draw(CWindow *theWindow)
         p->Draw(theWindow);
     }
     
+    mSwitch->Draw(theWindow);
+    
     // Draw the darkness over the level but make sure the player and torch are visible
-    mTorch->DrawDarkness(theWindow);
+    if (!mLightsOn)
+    {
+        mTorch->DrawDarkness(theWindow);
+    }
     
     mPlayer->Draw(theWindow);
     mTorch->Draw(theWindow);
@@ -117,6 +141,11 @@ std::list<CPlatform *> CLevel::GetPlatforms()
     return mPlatforms;
 }
 
+void CLevel::TurnOnLights()
+{
+    mLightsOn = true;
+}
+
 CLevel * CLevel::GetCurrent()
 {
     return smCurrentLevel;
@@ -124,12 +153,17 @@ CLevel * CLevel::GetCurrent()
 
 void CLevel::HandleCollisions()
 {
+    CVector2f cv;
     for (auto p: mPlatforms)
     {
-        CVector2f cv;
         if (CollisionHandler::AreColliding(mPlayer->GetHitbox(), p->GetHitbox(), &cv))
         {
             mPlayer->ReactToCollisionWith(p, cv);
         }
+    }
+    
+    if (CollisionHandler::AreColliding(mPlayer->GetHitbox(), mSwitch->GetHitbox(), &cv))
+    {
+        mSwitch->ReactToCollisionWith(mPlayer, cv);
     }
 }

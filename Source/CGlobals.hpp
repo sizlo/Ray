@@ -7,6 +7,7 @@ class CGlobals
 {
 public:
     static float playerSize;
+    static float switchSize;
     static CVector2f gravity;
 };
 
