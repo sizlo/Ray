@@ -198,7 +198,31 @@ void CPlayer::TryStartJump()
     if (mJumpsLeft > 0)
     {
         mJumpsLeft--;
-        mVSpeed = -mInitialJumpSpeed;
+        CVector2f direction;
+        switch (mState)
+        {
+            case kGrounded: // If we're on the ground jump directly up
+                direction = upDir;
+                mVSpeed = mInitialJumpSpeed * direction.y;
+                break;
+            case kInAir: // If we're in the air use the current input direction to decide which way to jump
+                direction = upDir;
+                if (CKeyboard::isKeyPressed(CKeyboard::A))
+                {
+                    direction += leftDir;
+                }
+                if (CKeyboard::isKeyPressed(CKeyboard::D))
+                {
+                    direction += rightDir;
+                }
+                mVSpeed = mInitialJumpSpeed * direction.y;
+                mHSpeed = mInitialJumpSpeed * direction.x;
+                break;
+            case kOnWall:
+                break;
+            case kStateCount: // Do nothing
+                break;
+        }
         mState = kInAir;
     }
 }
