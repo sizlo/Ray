@@ -36,11 +36,13 @@ public:
     
 private:
     bool IsGroundBeneathUs();
+    bool IsWallOnAttachedSide();
     void UpdateState();
     void TryStartJump();
     void ResetJumps();
     void DoHorizontalMovement(CTime elapsedTime);
     void DoVerticalMovement(CTime elapsedTime);
+    void TryToDetach(CTime elapsedTime);
     
     CConvexShape mShape;
     EPlayerState mState;
@@ -50,6 +52,13 @@ private:
     float mHSpeed;
     float mVSpeed;
     int mJumpsLeft;
+    CVector2f mAttachedDirection;
+    float mWallUpDeceleration;
+    float mWallDownDeceleration;
+    float mWallDownAcceleration;
+    float mWallSlideSpeed;
+    CTime mDetachTime;
+    CTime mCurrentDetachTimeCounter;
 };
 
 #endif // __Ray__CPlayer__

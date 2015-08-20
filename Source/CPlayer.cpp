@@ -24,6 +24,15 @@ CPlayer::CPlayer()
     mHAcceleration[kOnWall] = 0.0f;
     
     mInitialJumpSpeed = 1100.0f;
+    
+    // How much to decelerate when sliding up a wall too fast
+    mWallUpDeceleration = 4000.0f;
+    // How much to decelerate when sliding down a wall too fast
+    mWallDownDeceleration = 6000.0f;
+    // How much to accelerate when sliding down a wall to slow
+    mWallDownAcceleration = 3000.0f;
+    mWallSlideSpeed = mTopHSpeed[kGrounded] / 3.0f;
+    mDetachTime = CTime::Seconds(0.016 * 8); // 8 frames at 60fps
 }
 
 CPlayer::~CPlayer()
@@ -55,6 +64,8 @@ void CPlayer::Update(CTime elapsedTime)
             DoVerticalMovement(elapsedTime);
             break;
         case kOnWall:
+            TryToDetach(elapsedTime);
+            DoVerticalMovement(elapsedTime);
             break;
         case kStateCount: // Do nothing
             break;
@@ -83,10 +94,11 @@ void CPlayer::DrawDebugText(CWindow *theWindow)
         default: stateString = "Unknown"; break;
     }
     char buffer[1024];
-    sprintf(buffer, "mHSpeed: %f\nmVSpeed: %f\nmState: %s",
+    sprintf(buffer, "mHSpeed: %f\nmVSpeed: %f\nmState: %s\nmCurrentDetachTimer: %f",
             mHSpeed,
             mVSpeed,
-            stateString.c_str());
+            stateString.c_str(),
+            mCurrentDetachTimeCounter.asSeconds());
     theWindow->DrawTextAt(buffer, 500.0f, 500.0f, CColour::Black, 24);
 }
 
@@ -150,6 +162,11 @@ void CPlayer::ReactToCollisionWith(CPlatform *platform, CVector2f cv)
     else if (direction == leftDir || direction == rightDir) // Collided with wall
     {
         // Will eventually attach to wall, for now keep current state
+        ResetJumps();
+        mAttachedDirection = direction;
+        mAttachedDirection.x = -mAttachedDirection.x;
+        mCurrentDetachTimeCounter = CTime::Zero;
+        mState = kOnWall;
         mHSpeed = 0.0f;
     }
 }
@@ -179,8 +196,44 @@ bool CPlayer::IsGroundBeneathUs()
         }
     }
     
-    
     return groundBeneathUs;
+}
+
+bool CPlayer::IsWallOnAttachedSide()
+{
+    bool wallOnAttachedSide = false;
+    
+    // Create a sensor to check beside us
+    float top = mShape.getGlobalBounds().top;
+    float left = mShape.getGlobalBounds().left;
+    float right = left + mShape.getGlobalBounds().width;
+    float height = mShape.getGlobalBounds().height;
+    CConvexShape sensor = CRectangleShape(1.0f, height);
+    if (mAttachedDirection == leftDir)
+    {
+        sensor.setPosition(left - 1.0f, top);
+    }
+    else if (mAttachedDirection == rightDir)
+    {
+        sensor.setPosition(right, top);
+    }
+    
+    // Check for a collision with all the platforms
+    std::list<CPlatform *> platforms = CLevel::GetCurrent()->GetPlatforms();
+    for (auto p: platforms)
+    {
+        CVector2f cv;
+        if (CollisionHandler::AreColliding(sensor, p->GetHitbox(), &cv))
+        {
+            if ((mAttachedDirection == leftDir && cv.GetDirection() == rightDir)
+                || (mAttachedDirection == rightDir && cv.GetDirection() == leftDir))
+            {
+                wallOnAttachedSide = true;
+            }
+        }
+    }
+    
+    return wallOnAttachedSide;
 }
 
 void CPlayer::UpdateState()
@@ -189,6 +242,12 @@ void CPlayer::UpdateState()
     {
         mState = kInAir;
         // Remove a jump since we fell off a platform
+        mJumpsLeft--;
+    }
+    if (mState == kOnWall && !IsWallOnAttachedSide())
+    {
+        mState = kInAir;
+        // Remove a jump since we fell off a wall
         mJumpsLeft--;
     }
 }
@@ -209,16 +268,34 @@ void CPlayer::TryStartJump()
                 direction = upDir;
                 if (CKeyboard::isKeyPressed(CKeyboard::A))
                 {
-                    direction += leftDir;
+                    direction = upDir + leftDir;
+                    mVSpeed = mInitialJumpSpeed * direction.y;
+                    mHSpeed = mInitialJumpSpeed * direction.x;
                 }
-                if (CKeyboard::isKeyPressed(CKeyboard::D))
+                else if (CKeyboard::isKeyPressed(CKeyboard::D))
+                {
+                    direction = upDir + rightDir;
+                    mVSpeed = mInitialJumpSpeed * direction.y;
+                    mHSpeed = mInitialJumpSpeed * direction.x;
+                }
+                else
+                {
+                    direction = upDir;
+                    mVSpeed = mInitialJumpSpeed * direction.y;
+                }
+                break;
+            case kOnWall:
+                direction = upDir;
+                if (mAttachedDirection == leftDir)
                 {
                     direction += rightDir;
                 }
+                else if (mAttachedDirection == rightDir)
+                {
+                    direction += leftDir;
+                }
                 mVSpeed = mInitialJumpSpeed * direction.y;
                 mHSpeed = mInitialJumpSpeed * direction.x;
-                break;
-            case kOnWall:
                 break;
             case kStateCount: // Do nothing
                 break;
@@ -278,6 +355,54 @@ void CPlayer::DoHorizontalMovement(CTime elapsedTime)
 
 void CPlayer::DoVerticalMovement(CTime elapsedTime)
 {
-    mVSpeed += CGlobals::gravity.y * elapsedTime.asSeconds();
-    mShape.move(0.0f, mVSpeed * elapsedTime.asSeconds());
+    switch (mState)
+    {
+        case kGrounded: // Do nothing
+            break;
+        case kInAir:
+            mVSpeed += CGlobals::gravity.y * elapsedTime.asSeconds();
+            mShape.move(0.0f, mVSpeed * elapsedTime.asSeconds());
+            break;
+        case kOnWall:
+            // If going up always decelerate downwards
+            if (mVSpeed < 0.0f)
+            {
+                mVSpeed += mWallUpDeceleration * elapsedTime.asSeconds();
+            }
+            // If going down faster than we should decelerate upwards
+            else if (mVSpeed > mWallSlideSpeed)
+            {
+                mVSpeed -= mWallDownDeceleration * elapsedTime.asSeconds();
+                if (mVSpeed < mWallSlideSpeed) mVSpeed = mWallSlideSpeed;
+            }
+            // If going down slower than we should accerlerate downwards
+            else if (mVSpeed < mWallSlideSpeed)
+            {
+                mVSpeed += mWallDownAcceleration * elapsedTime.asSeconds();
+                if (mVSpeed > mWallSlideSpeed) mVSpeed = mWallSlideSpeed;
+            }
+            mShape.move(0.0f, mVSpeed * elapsedTime.asSeconds());
+            break;
+        case kStateCount: // Do nothing
+            break;
+    }
+}
+
+void CPlayer::TryToDetach(CTime elapsedTime)
+{
+    if ((mAttachedDirection == leftDir && CKeyboard::isKeyPressed(CKeyboard::D))
+        || (mAttachedDirection == rightDir && CKeyboard::isKeyPressed(CKeyboard::A)))
+    {
+        mCurrentDetachTimeCounter += elapsedTime;
+        if (mCurrentDetachTimeCounter >= mDetachTime)
+        {
+            // We detached from a wall so remove a jump
+            mJumpsLeft--;
+            mState = kInAir;
+        }
+    }
+    else
+    {
+        mCurrentDetachTimeCounter = CTime::Zero;
+    }
 }
