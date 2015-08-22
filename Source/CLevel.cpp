@@ -17,7 +17,7 @@ CLevel::CLevel()
     mPlatforms.push_back(new CPlatform(CVector2f(0.0f, 0.0f), wallSize, GameOptions::viewHeight));
     mPlatforms.push_back(new CPlatform(CVector2f(GameOptions::viewWidth - wallSize, 0.0f), wallSize, GameOptions::viewHeight));
     
-    // Lower 2 platforms
+    // Platforms
     float width = (GameOptions::viewWidth - (2 * wallSize)) / 5.0f;
     float hSpacing = width;
     float height = wallSize;
@@ -42,6 +42,7 @@ CLevel::~CLevel()
     FREE_LIST_CONTENTS(mPlatforms);
     SAFE_DELETE(mPlayer);
     SAFE_DELETE(mTorch);
+    SAFE_DELETE(mSwitch);
 }
 
 void CLevel::Enter()
