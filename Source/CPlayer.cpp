@@ -161,12 +161,14 @@ void CPlayer::ReactToCollisionWith(CPlatform *platform, CVector2f cv)
     }
     else if (direction == leftDir || direction == rightDir) // Collided with wall
     {
-        // Will eventually attach to wall, for now keep current state
-        ResetJumps();
-        mAttachedDirection = direction;
-        mAttachedDirection.x = -mAttachedDirection.x;
-        mCurrentDetachTimeCounter = CTime::Zero;
-        mState = kOnWall;
+        if (mState == kInAir)
+        {
+            ResetJumps();
+            mAttachedDirection = direction;
+            mAttachedDirection.x = -mAttachedDirection.x;
+            mCurrentDetachTimeCounter = CTime::Zero;
+            mState = kOnWall;
+        }
         mHSpeed = 0.0f;
     }
 }
