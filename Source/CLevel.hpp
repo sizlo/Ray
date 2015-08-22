@@ -9,6 +9,7 @@
 #include "CPlayer.hpp"
 #include "CTorch.hpp"
 #include "CSwitch.hpp"
+#include "CToolTip.hpp"
 
 class CLevel :  public CUpdateable,
                 public CRenderable,
@@ -42,6 +43,7 @@ public:
     
 private:
     void HandleCollisions();
+    bool PlayerIsOutOfBounds();
     
     std::list<CPlatform *> mPlatforms;
     CPlayer *mPlayer;
@@ -49,8 +51,8 @@ private:
     CTorch *mTorch;
     CSwitch *mSwitch;
     CVector2f mSwitchPos;
-    
     bool mLightsOn;
+    CToolTip mResetTooltip;
     
     static CLevel *smCurrentLevel;
 };

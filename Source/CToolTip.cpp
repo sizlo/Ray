@@ -18,6 +18,9 @@ CToolTip::CToolTip(std::string theText, float yCoord)
     mShape = CRectangleShape(mWidth, mText.getGlobalBounds().height + (2*mTextMargin));
     mShape.setFillColor(CColour::Blue);
     mYCoord = yCoord;
+    mLingerTime = CTime::Seconds(5.0f);
+    mIsInfinite = false;
+    
     Reset();
 }
 
@@ -36,18 +39,16 @@ void CToolTip::Update(CTime elapsedTime)
         if (mTweener.IsDone())
         {
             // Advance state
-            mState++;
+            SetState(mState + 1);
         }
     }
     else if (mState == kLingering)
     {
         mLingerTimeCounter += elapsedTime;
-        if (mLingerTimeCounter > mLingerTime)
+        if (mLingerTimeCounter > mLingerTime && !mIsInfinite)
         {
             // Advance state
-            mState++;
-            // We're now exiting, create the exit tweener
-            mTweener = CTweener(Easings::Sine::easeIn, mMargin, -mWidth, CTime::Seconds(1.0f));
+            SetState(mState + 1);
         }
     }
 }
@@ -60,16 +61,52 @@ void CToolTip::Draw(CWindow *theWindow)
 
 void CToolTip::Reset()
 {
-    mTweener = CTweener(Easings::Back::easeOut, -mWidth, mMargin, CTime::Seconds(1.0f));
-    mTweener.Reset();
-    mState = kEntering;
-    mLingerTimeCounter = CTime::Zero;
-    mLingerTime = CTime::Seconds(5.0f);
+    SetState(kEntering);
+}
+
+void CToolTip::SetState(int state)
+{
+    switch (state)
+    {
+        case kEntering:
+            mTweener = CTweener(Easings::Back::easeOut, -mWidth, mMargin, CTime::Seconds(1.0f));
+            UpdatePosition();
+            break;
+        case kLingering:
+            mLingerTimeCounter = CTime::Zero;
+            break;
+        case kExiting:
+            mTweener = CTweener(Easings::Sine::easeIn, mMargin, -mWidth, CTime::Seconds(1.0f));
+            break;
+        case kDone:
+            break;
+    }
+    mState = state;
+}
+
+bool CToolTip::IsEntering()
+{
+    return mState == kEntering;
+}
+
+bool CToolTip::IsLingering()
+{
+    return mState == kLingering;
+}
+
+bool CToolTip::IsExiting()
+{
+    return mState == kExiting;
 }
 
 bool CToolTip::IsDone()
 {
     return mState == kDone;
+}
+
+void CToolTip::SetInfinite(bool isInfinite)
+{
+    mIsInfinite = isInfinite;
 }
 
 void CToolTip::UpdatePosition()
@@ -83,4 +120,17 @@ void CToolTip::UpdatePosition()
     CVector2f textPos(mText.getGlobalBounds().left, mText.getGlobalBounds().top);
     mText.move(pos - textPos);
     mText.move(mTextMargin, mTextMargin);
+}
+
+std::string CToolTip::GetStateString()
+{
+    std::string theState;
+    switch (mState)
+    {
+        case kEntering: theState = "Entering"; break;
+        case kLingering: theState =  "Lingering"; break;
+        case kExiting: theState =  "Exiting"; break;
+        case kDone: theState =  "Done"; break;
+    }
+    return theState;
 }

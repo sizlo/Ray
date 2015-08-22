@@ -15,6 +15,9 @@ CLevel::CLevel()
     mPlayer = new CPlayer();
     mTorch = new CTorch(mPlayer);
     mSwitch = new CSwitch();
+    
+    mResetTooltip = CToolTip("Press R to reset the level", 100.0f);
+    mResetTooltip.SetInfinite(true);
 }
 
 CLevel::CLevel(std::string filename) : CLevel()
@@ -70,6 +73,10 @@ bool CLevel::HandleMessage(CEvent e)
     {
         if (e.key.code == CKeyboard::R)
         {
+            if (PlayerIsOutOfBounds())
+            {
+                mResetTooltip.SetState(kExiting);
+            }
             StartLevel();
         }
 #if TGL_DEBUG
@@ -98,6 +105,18 @@ void CLevel::Update(CTime elapsedTime)
     HandleCollisions();
     
     mTorch->Update(elapsedTime);
+    
+    if (PlayerIsOutOfBounds())
+    {
+        if (mResetTooltip.IsDone() || mResetTooltip.IsExiting())
+        {
+            mResetTooltip.SetState(kEntering);
+        }
+    }
+    if (PlayerIsOutOfBounds() || mResetTooltip.IsExiting())
+    {
+        mResetTooltip.Update(elapsedTime);
+    }
 }
 
 void CLevel::Draw(CWindow *theWindow)
@@ -117,6 +136,8 @@ void CLevel::Draw(CWindow *theWindow)
     
     mPlayer->Draw(theWindow);
     mTorch->Draw(theWindow);
+    
+    mResetTooltip.Draw(theWindow);
 }
 
 void CLevel::AddPlatform(CPlatform *p)
@@ -174,4 +195,10 @@ void CLevel::HandleCollisions()
     {
         mSwitch->ReactToCollisionWith(mPlayer, cv);
     }
+}
+
+bool CLevel::PlayerIsOutOfBounds()
+{
+    CFloatRect bounds(0.0f, 0.0f, GameOptions::viewWidth, GameOptions::viewHeight);
+    return !bounds.intersects(mPlayer->GetHitbox().getGlobalBounds());
 }

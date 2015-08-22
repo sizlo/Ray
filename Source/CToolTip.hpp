@@ -24,10 +24,16 @@ public:
     void Draw(CWindow *theWindow);
     
     void Reset();
+    void SetState(int state);
+    bool IsEntering();
+    bool IsLingering();
+    bool IsExiting();
     bool IsDone();
+    void SetInfinite(bool isInfinite);
     
 private:
     void UpdatePosition();
+    std::string GetStateString();
     
     CBoundedText mText;
     CConvexShape mShape;
@@ -41,6 +47,8 @@ private:
     int mState;
     CTime mLingerTimeCounter;
     CTime mLingerTime;
+    
+    bool mIsInfinite;
 };
 
 #endif // __Ray__CToolTip__
