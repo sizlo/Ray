@@ -1,7 +1,7 @@
 #include "CFrontEnd.hpp"
 #include "GUIMenu/CButtonWidget.hpp"
 #include "CRayGame.hpp"
-#include "CTutorialLevel.hpp"
+#include "CLevelSelect.hpp"
 
 CFrontEnd::CFrontEnd() : CGUIMenu()
 {
@@ -29,7 +29,7 @@ CFrontEnd::~CFrontEnd()
 void CFrontEnd::HandlePlayButton()
 {
     DEBUG_LOG("Play button pressed");
-    CRayGame::Get()->PushGameLocation(new CTutorialLevel());
+    CRayGame::Get()->PushGameLocation(new CLevelSelect());
 }
 
 void CFrontEnd::HandleOptionsButton()
