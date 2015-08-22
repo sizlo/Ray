@@ -78,7 +78,7 @@ void CPlayer::Draw(CWindow *theWindow)
 {
     theWindow->DrawShape(mShape);
     
-#if TGL_DEBUG
+#if TGL_DEBUG && 0 // Disable unless needed
     DrawDebugText(theWindow);
 #endif
 }
