@@ -1,6 +1,7 @@
 #include "CToolTip.hpp"
 #include "TextUtilties.hpp"
-#include "Tweening/Easings/Elastic.hpp"
+#include "Tweening/Easings/Back.hpp"
+#include "Tweening/Easings/Sine.hpp"
 
 CToolTip::CToolTip() : CToolTip("", 100.0f)
 {
@@ -9,15 +10,15 @@ CToolTip::CToolTip() : CToolTip("", 100.0f)
 
 CToolTip::CToolTip(std::string theText, float yCoord)
 {
-    float width = 500.0f;
+    mWidth = 500.0f;
     mTextMargin = 10.0f;
     mMargin = 100.0f;
-    float maxTextWidth = width - (2*mTextMargin);
+    float maxTextWidth = mWidth - (2*mTextMargin);
     mText = CBoundedText(theText, maxTextWidth, *TextUtilities::GetFont(kFontTypeDefault), 30.0f);
-    mShape = CRectangleShape(width, mText.getGlobalBounds().height + (2*mTextMargin));
+    mShape = CRectangleShape(mWidth, mText.getGlobalBounds().height + (2*mTextMargin));
     mShape.setFillColor(CColour::Blue);
     mYCoord = yCoord;
-    mTweener = CTweener(Easings::Elastic::easeOut, -width, mMargin, CTime::Seconds(2.0f));
+    Reset();
 }
 
 CToolTip::~CToolTip()
@@ -27,8 +28,28 @@ CToolTip::~CToolTip()
 
 void CToolTip::Update(CTime elapsedTime)
 {
-    mTweener.Advance(elapsedTime);
-    UpdatePosition();
+    if (mState == kEntering || mState == kExiting)
+    {
+        mTweener.Advance(elapsedTime);
+        UpdatePosition();
+        
+        if (mTweener.IsDone())
+        {
+            // Advance state
+            mState++;
+        }
+    }
+    else if (mState == kLingering)
+    {
+        mLingerTimeCounter += elapsedTime;
+        if (mLingerTimeCounter > mLingerTime)
+        {
+            // Advance state
+            mState++;
+            // We're now exiting, create the exit tweener
+            mTweener = CTweener(Easings::Sine::easeIn, mMargin, -mWidth, CTime::Seconds(1.0f));
+        }
+    }
 }
 
 void CToolTip::Draw(CWindow *theWindow)
@@ -39,13 +60,22 @@ void CToolTip::Draw(CWindow *theWindow)
 
 void CToolTip::Reset()
 {
+    mTweener = CTweener(Easings::Back::easeOut, -mWidth, mMargin, CTime::Seconds(1.0f));
     mTweener.Reset();
+    mState = kEntering;
+    mLingerTimeCounter = CTime::Zero;
+    mLingerTime = CTime::Seconds(5.0f);
+}
+
+bool CToolTip::IsDone()
+{
+    return mState == kDone;
 }
 
 void CToolTip::UpdatePosition()
 {
-    float xCoord = mTweener.GetCurrentValue();
-    CVector2f pos(xCoord, mYCoord);
+    mXCoord = mTweener.GetCurrentValue();
+    CVector2f pos(mXCoord, mYCoord);
     mShape.setPosition(pos);
     
     // We need to do some shenanigans to get the text positioned right, since

@@ -5,6 +5,14 @@
 #include "CRenderable.hpp"
 #include "Tweening/CTweener.hpp"
 
+enum EToolTipState
+{
+    kEntering,
+    kLingering,
+    kExiting,
+    kDone
+};
+
 class CToolTip : public CUpdateable, public CRenderable
 {
 public:
@@ -16,16 +24,23 @@ public:
     void Draw(CWindow *theWindow);
     
     void Reset();
+    bool IsDone();
     
 private:
     void UpdatePosition();
     
     CBoundedText mText;
     CConvexShape mShape;
+    float mWidth;
+    float mXCoord;
     float mYCoord;
     float mTextMargin;
     float mMargin;
     CTweener mTweener;
+    
+    int mState;
+    CTime mLingerTimeCounter;
+    CTime mLingerTime;
 };
 
 #endif // __Ray__CToolTip__
