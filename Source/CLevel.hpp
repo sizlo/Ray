@@ -19,10 +19,11 @@ public:
     CLevel();
     ~CLevel();
     
-    void StartLevel();
+    virtual void StartLevel();
     
-    void Update (CTime elapsedTime);
-    void Draw (CWindow *theWindow);
+    virtual void Update (CTime elapsedTime);
+    virtual void Draw (CWindow *theWindow);
+    
     void Enter();
     void Exit();
     bool HandleMessage(CEvent e);
