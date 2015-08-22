@@ -11,30 +11,9 @@ float wallSize = 50.0f;
 
 CLevel::CLevel()
 {
-    // Walls/floors
-    mPlatforms.push_back(new CPlatform(CVector2f(0.0f, GameOptions::viewHeight - wallSize), GameOptions::viewWidth, wallSize));
-    mPlatforms.push_back(new CPlatform(CVector2f(0.0f, 0.0f), GameOptions::viewWidth, wallSize));
-    mPlatforms.push_back(new CPlatform(CVector2f(0.0f, 0.0f), wallSize, GameOptions::viewHeight));
-    mPlatforms.push_back(new CPlatform(CVector2f(GameOptions::viewWidth - wallSize, 0.0f), wallSize, GameOptions::viewHeight));
-    
-    // Platforms
-    float width = (GameOptions::viewWidth - (2 * wallSize)) / 5.0f;
-    float hSpacing = width;
-    float height = wallSize;
-    float vSpacing = (GameOptions::viewHeight - (2 * wallSize) - (2 * height)) / 3.0f;
-    
-    float x = wallSize + hSpacing;
-    float y = wallSize + vSpacing + height + vSpacing;
-    mPlatforms.push_back(new CPlatform(CVector2f(x, y), width, height));
-    x += width + hSpacing;
-    mPlatforms.push_back(new CPlatform(CVector2f(x, y), width, height));
-    x = wallSize + hSpacing + width;
-    y = wallSize + vSpacing;
-    mPlatforms.push_back(new CPlatform(CVector2f(x, y), width, height));
-    
     mPlayer = new CPlayer();
     mTorch = new CTorch(mPlayer);
-    mSwitch = new CSwitch(CVector2f(GameOptions::viewWidth / 2.0f, wallSize + vSpacing - CGlobals::switchSize));
+    mSwitch = new CSwitch();
 }
 
 CLevel::~CLevel()
@@ -129,6 +108,11 @@ void CLevel::Draw(CWindow *theWindow)
     
     mPlayer->Draw(theWindow);
     mTorch->Draw(theWindow);
+}
+
+void CLevel::AddPlatform(CPlatform *p)
+{
+    mPlatforms.push_back(p);
 }
 
 std::list<CConvexShape> CLevel::GetOccluders()

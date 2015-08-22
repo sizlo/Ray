@@ -27,6 +27,7 @@ public:
     void Exit();
     bool HandleMessage(CEvent e);
     
+    void AddPlatform(CPlatform *p);
     std::list<CConvexShape> GetOccluders();
     std::list<CPlatform *> GetPlatforms();
     
