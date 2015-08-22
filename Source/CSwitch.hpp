@@ -7,12 +7,13 @@
 class CSwitch : public CRenderable
 {
 public:
-    CSwitch(CVector2f position);
+    CSwitch();
     ~CSwitch();
     
     void Draw(CWindow *theWindow);
     
     CConvexShape & GetHitbox();
+    void SetPosition(CVector2f pos);
     
     void ReactToCollisionWith(CPlayer *player, CVector2f cv);
     
