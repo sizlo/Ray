@@ -4,6 +4,7 @@
 #include "CGlobals.hpp"
 #include "CollisionHandler.hpp"
 #include "CMessageBroadcaster.hpp"
+#include "CLevelInterpreter.hpp"
 
 CLevel * CLevel::smCurrentLevel = NULL;
 
@@ -14,6 +15,15 @@ CLevel::CLevel()
     mPlayer = new CPlayer();
     mTorch = new CTorch(mPlayer);
     mSwitch = new CSwitch();
+}
+
+CLevel::CLevel(std::string filename) : CLevel()
+{
+    CLevelInterpreter i(filename);
+    if (i.LoadFile())
+    {
+        i.Parse(this);
+    }
 }
 
 CLevel::~CLevel()

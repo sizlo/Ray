@@ -17,6 +17,7 @@ class CLevel :  public CUpdateable,
 {
 public:
     CLevel();
+    CLevel(std::string filename);
     ~CLevel();
     
     virtual void StartLevel();
