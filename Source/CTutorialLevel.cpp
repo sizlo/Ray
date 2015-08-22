@@ -26,6 +26,10 @@ CTutorialLevel::CTutorialLevel() : CLevel()
     float bigObsHeight = 300.0f;
     AddPlatform(new CPlatform(CVector2f(1200.0f, GameOptions::viewHeight - floorHeight - bigObsHeight), wallWidth, bigObsHeight));
     
+    // Overhang
+    float overhangHeight = 100.0f;
+    AddPlatform(new CPlatform(CVector2f(GameOptions::viewWidth - 2*wallWidth - chuteWidth, ceilingHeight), wallWidth, overhangHeight));
+    
     SetPlayerStartPosition(CVector2f(100.0f, GameOptions::viewHeight - floorHeight - CGlobals::playerSize));
     SetSwitchPosition(CVector2f(GameOptions::viewWidth - wallWidth - (chuteWidth/2.0f), wallWidth + CGlobals::switchSize));
     
