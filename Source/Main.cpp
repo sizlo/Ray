@@ -3,7 +3,7 @@
 int main(int argc, char **argv)
 {
     CRayGame theGame;
-    theGame.Init(kGameLocationLevel);
+    theGame.Init(kGameLocationTutorial);
     int returnCode = theGame.Run();
     theGame.Cleanup();
     

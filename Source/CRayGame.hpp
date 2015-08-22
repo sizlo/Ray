@@ -7,7 +7,8 @@ class CLevel;
 
 enum EDMGameLocation
 {
-    kGameLocationLevel = kGameLocationDummy + 1
+    kGameLocationLevel = kGameLocationDummy + 1,
+    kGameLocationTutorial
 };
 
 class CRayGame : public CGame

@@ -1,5 +1,6 @@
 #include "CRayGame.hpp"
 #include "CLevel.hpp"
+#include "CTutorialLevel.hpp"
 
 CRayGame * CRayGame::Get()
 {
@@ -18,25 +19,22 @@ void CRayGame::InitialiseOptions()
 
 void CRayGame::GoToLocation(int theLocation, std::string filename)
 {
-    // If we're already in a location leave it
-    if (mCurrentLocation != NULL)
-    {
-        mCurrentLocation->Exit();
-        SAFE_DELETE(mCurrentLocation);
-    }
-    
+    // Set up the next location
     switch (theLocation)
     {
         case kGameLocationLevel:
             DEBUG_LOG("Level requested");
-            mCurrentLocation = new CLevel();
+            mNextLocation = new CLevel();
+            break;
+            
+        case kGameLocationTutorial:
+            DEBUG_LOG("Tutorial requested")
+            mNextLocation = new CTutorialLevel();
             break;
             
         default:
             DEBUG_LOG("Unimplemented game location - going to dummy location");
-            mCurrentLocation = new CDummyGameLocation();
+            mNextLocation = new CDummyGameLocation();
             break;
     }
-    
-    mCurrentLocation->Enter();
 }
