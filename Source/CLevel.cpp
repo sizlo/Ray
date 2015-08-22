@@ -76,9 +76,8 @@ bool CLevel::HandleMessage(CEvent e)
 void CLevel::StartLevel()
 {
     mLightsOn = false;
-    float playerX = (GameOptions::viewWidth / 2.0f) - (CGlobals::playerSize / 2.0f);
-    float playerY = GameOptions::viewHeight - wallSize - CGlobals::playerSize;
-    mPlayer->Init(CVector2f(playerX, playerY));
+    mPlayer->Init(mPlayerStartPos);
+    mSwitch->SetPosition(mSwitchPos);
 }
 
 void CLevel::Update(CTime elapsedTime)
@@ -128,6 +127,16 @@ std::list<CConvexShape> CLevel::GetOccluders()
 std::list<CPlatform *> CLevel::GetPlatforms()
 {
     return mPlatforms;
+}
+
+void CLevel::SetPlayerStartPosition(CVector2f pos)
+{
+    mPlayerStartPos = pos;
+}
+
+void CLevel::SetSwitchPosition(CVector2f pos)
+{
+    mSwitchPos = pos;
 }
 
 void CLevel::TurnOnLights()

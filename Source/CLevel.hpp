@@ -31,6 +31,9 @@ public:
     std::list<CConvexShape> GetOccluders();
     std::list<CPlatform *> GetPlatforms();
     
+    void SetPlayerStartPosition(CVector2f pos);
+    void SetSwitchPosition(CVector2f pos);
+    
     void TurnOnLights();
     
     static CLevel * GetCurrent();
@@ -40,8 +43,10 @@ private:
     
     std::list<CPlatform *> mPlatforms;
     CPlayer *mPlayer;
+    CVector2f mPlayerStartPos;
     CTorch *mTorch;
     CSwitch *mSwitch;
+    CVector2f mSwitchPos;
     
     bool mLightsOn;
     
