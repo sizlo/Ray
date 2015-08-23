@@ -292,7 +292,12 @@ void CPlayer::TryStartJump()
                 break;
             case kInAir: // If we're in the air use the current input direction to decide which way to jump
                 direction = upDir;
-                if (CKeyboard::isKeyPressed(CKeyboard::A))
+                if (CKeyboard::isKeyPressed(CKeyboard::A) && CKeyboard::isKeyPressed(CKeyboard::D))
+                {
+                    direction = upDir;
+                    mVSpeed = mInitialJumpSpeed * direction.y;
+                }
+                else if (CKeyboard::isKeyPressed(CKeyboard::A))
                 {
                     direction = upDir + leftDir;
                     mVSpeed = mInitialJumpSpeed * direction.y;
