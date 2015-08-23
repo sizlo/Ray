@@ -10,13 +10,85 @@
     <y>300</y>
   </switchPos>
 
-  <platform>
-    <position>
-      <x>0</x>
-      <y>1030</y>
-    </position>
-    <width>1920</width>
-    <height>50</height>
-  </platform>
+    <platform>
+        <position>
+            <x>0</x>
+            <y>1030</y>
+        </position>
+        <width>1920</width>
+        <height>50</height>
+    </platform>
+
+    <platform>
+        <position>
+            <x>0</x>
+            <y>0</y>
+        </position>
+        <width>50</width>
+        <height>1080</height>
+    </platform>
+    
+    <platform>
+        <position>
+            <x>400</x>
+            <y>500</y>
+        </position>
+        <width>400</width>
+        <height>50</height>
+    </platform>
+    
+    <platform>
+        <position>
+            <x>1100</x>
+            <y>500</y>
+        </position>
+        <width>400</width>
+        <height>50</height>
+    </platform>
+    
+    <platform>
+        <position>
+            <x>800</x>
+            <y>500</y>
+        </position>
+        <width>50</width>
+        <height>300</height>
+    </platform>
+    
+    <hazard>
+        <position>
+            <x>1500</x>
+            <y>1010</y>
+        </position>
+        <width>200</width>
+        <height>20</height>
+    </hazard>
+    
+    <hazard>
+        <position>
+            <x>50</x>
+            <y>200</y>
+        </position>
+        <width>20</width>
+        <height>40</height>
+    </hazard>
+    
+    <hazard>
+        <position>
+            <x>850</x>
+            <y>650</y>
+        </position>
+        <width>20</width>
+        <height>40</height>
+    </hazard>
+    
+    <hazard>
+        <position>
+            <x>850</x>
+            <y>100</y>
+        </position>
+        <width>100</width>
+        <height>100</height>
+    </hazard>
 
 </level>
