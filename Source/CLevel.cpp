@@ -21,7 +21,7 @@ CLevel::CLevel()
     mResetTooltip = CToolTip("Press R to reset the level", 100.0f);
     mResetTooltip.SetInfinite(true);
     
-    mLevelWinToolTip = CToolTip("Level complete\nPress Esc to return to level select", 10.0f);
+    mLevelWinToolTip = CToolTip("Ray turned on the lights\nPress Esc to return to level select", 10.0f);
     mLevelWinToolTip.SetInfinite(true);
 }
 
@@ -109,6 +109,8 @@ void CLevel::StartLevel()
 
 void CLevel::Update(CTime elapsedTime)
 {
+    bool playerWasDead = mPlayer->IsDead();
+    
     if (!PlayerIsOutOfBounds())
     {
         mPlayer->Update(elapsedTime);
@@ -134,6 +136,11 @@ void CLevel::Update(CTime elapsedTime)
     if (mLightsOn || mLevelWinToolTip.IsExiting())
     {
         mLevelWinToolTip.Update(elapsedTime);
+    }
+    
+    if (!playerWasDead && mPlayer->IsDead())
+    {
+        mResetTooltip.SetText("Ray " + mPlayer->GetDeathReason() + "\nPress R to reset level");
     }
 }
 
@@ -244,5 +251,12 @@ bool CLevel::PlayerIsDead()
 bool CLevel::PlayerIsOutOfBounds()
 {
     CFloatRect bounds(-GameOptions::viewWidth/2.0f, -GameOptions::viewHeight/2.0f, GameOptions::viewWidth * 2.0f, GameOptions::viewHeight * 2.0f);
-    return !bounds.intersects(mPlayer->GetHitbox().getGlobalBounds());
+    bool outOfBounds = !bounds.intersects(mPlayer->GetHitbox().getGlobalBounds());
+    
+    if (outOfBounds && !mPlayer->IsDead())
+    {
+        mPlayer->Kill("fell into the void");
+    }
+    
+    return outOfBounds;
 }

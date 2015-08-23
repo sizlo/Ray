@@ -144,14 +144,20 @@ CVector2f CPlayer::GetMidPoint()
     return mid;
 }
 
-void CPlayer::Kill()
+void CPlayer::Kill(std::string reason)
 {
+    mDeathReason = reason;
     mIsDead = true;
 }
 
 bool CPlayer::IsDead()
 {
     return mIsDead;
+}
+
+std::string CPlayer::GetDeathReason()
+{
+    return mDeathReason;
 }
 
 void CPlayer::ReactToCollisionWith(CPlatform *platform, CVector2f cv)
@@ -186,7 +192,7 @@ void CPlayer::ReactToCollisionWith(CPlatform *platform, CVector2f cv)
 
 void CPlayer::ReactToCollisionWith(CHazard *hazard, CVector2f cv)
 {
-    Kill();
+    Kill("touched a hazard");
 }
 
 bool CPlayer::IsGroundBeneathUs()

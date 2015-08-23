@@ -13,10 +13,8 @@ CToolTip::CToolTip(std::string theText, float yCoord)
     mWidth = 500.0f;
     mTextMargin = 10.0f;
     mMargin = 100.0f;
-    float maxTextWidth = mWidth - (2*mTextMargin);
-    mText = CBoundedText(theText, maxTextWidth, *TextUtilities::GetFont(kFontTypeDefault), 30.0f);
-    mShape = CRectangleShape(mWidth, mText.getGlobalBounds().height + (2*mTextMargin));
-    mShape.setFillColor(CColour::Blue);
+    mMaxTextWidth = mWidth - (2*mTextMargin);
+    SetText(theText);
     mYCoord = yCoord;
     mLingerTime = CTime::Seconds(5.0f);
     mIsInfinite = false;
@@ -57,6 +55,14 @@ void CToolTip::Draw(CWindow *theWindow)
 {
     theWindow->DrawShape(mShape);
     theWindow->draw(mText);
+}
+
+void CToolTip::SetText(std::string theText)
+{
+    mText = CBoundedText(theText, mMaxTextWidth, *TextUtilities::GetFont(kFontTypeDefault), 30.0f);
+    mShape = CRectangleShape(mWidth, mText.getGlobalBounds().height + (2*mTextMargin));
+    mShape.setFillColor(CColour::Blue);
+    UpdatePosition();
 }
 
 void CToolTip::Reset()

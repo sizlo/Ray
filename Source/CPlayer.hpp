@@ -33,8 +33,9 @@ public:
     CVector2f GetPosition();
     CVector2f GetMidPoint();
     
-    void Kill();
+    void Kill(std::string reason);
     bool IsDead();
+    std::string GetDeathReason();
     
     void ReactToCollisionWith(CPlatform *platform, CVector2f cv);
     void ReactToCollisionWith(CHazard *hazard, CVector2f cv);
@@ -65,6 +66,7 @@ private:
     CTime mDetachTime;
     CTime mCurrentDetachTimeCounter;
     bool mIsDead;
+    std::string mDeathReason;
 };
 
 #endif // __Ray__CPlayer__

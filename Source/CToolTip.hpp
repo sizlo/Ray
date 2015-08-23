@@ -23,6 +23,8 @@ public:
     void Update(CTime elapsedTime);
     void Draw(CWindow *theWindow);
     
+    void SetText(std::string theText);
+    
     void Reset();
     void SetState(int state);
     bool IsEntering();
@@ -41,6 +43,7 @@ private:
     float mXCoord;
     float mYCoord;
     float mTextMargin;
+    float mMaxTextWidth;
     float mMargin;
     CTweener mTweener;
     
