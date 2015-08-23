@@ -10,6 +10,9 @@ class CVideoOptions : public CGUIMenu
 public:
     CVideoOptions();
     ~CVideoOptions();
+    
+    void Update(CTime elapsedTime);
+    
 private:
     void HandleSaveButton();
     void HandleBackButton();
@@ -20,6 +23,9 @@ private:
     CToggleWidget *mPreserveAspectWidget;
     CPickerWidget *mAAWidget;
     CPickerWidget *mResolutionWidget;
+    
+    bool mLastFullscreenState;
+    int mNativeResolutionIndex;
     
     float mXPos;
     float mYPos;

@@ -18,4 +18,11 @@ void CRayGame::InitialiseOptions()
     
     // Then perform any generic initialisation (reads config)
     CGame::InitialiseOptions();
+    
+    // If we're in fullscreen force ourselves to native resolution
+    if (GameOptions::fullscreen)
+    {
+        GameOptions::windowWidth = CVideoMode::getDesktopMode().width;
+        GameOptions::windowHeight = CVideoMode::getDesktopMode().height;
+    }
 }

@@ -12,7 +12,7 @@ CVideoOptions::CVideoOptions() : CGUIMenu()
     mYPos = 200.0f;
     mYOffset = 70.0f;
     
-    mFullscreenWidget = new CToggleWidget(mXPos, mYPos, mWidgetWidth, mWidgetHeight, "Fullscreen", GameOptions::fullscreen);
+    mFullscreenWidget = new CToggleWidget(mXPos, mYPos, mWidgetWidth, mWidgetHeight, "Fullscreen (forces native resolution)", GameOptions::fullscreen);
     AddWidget(mFullscreenWidget);
     mYPos += mYOffset;
     mVsyncWidget = new CToggleWidget(mXPos, mYPos, mWidgetWidth, mWidgetHeight, "Vsync", GameOptions::doVsync);
@@ -49,6 +49,10 @@ CVideoOptions::CVideoOptions() : CGUIMenu()
         {
             mResolutionWidget->SetCurrentIndex(i);
         }
+        if (m.width == CVideoMode::getDesktopMode().width && m.height == CVideoMode::getDesktopMode().height)
+        {
+            mNativeResolutionIndex = i;
+        }
         i++;
     }
     AddWidget(mResolutionWidget);
@@ -64,11 +68,36 @@ CVideoOptions::CVideoOptions() : CGUIMenu()
     AddWidget(new CButtonWidget(mXPos, mYPos, mWidgetWidth, mWidgetHeight,
                                 "Exit", std::bind(&CVideoOptions::HandleExitButton, this)));
     mYPos += mYOffset;
+    
+    mLastFullscreenState = GameOptions::fullscreen;
+    if (mLastFullscreenState)
+    {
+        mResolutionWidget->SetActive(false);
+    }
 }
 
 CVideoOptions::~CVideoOptions()
 {
     
+}
+
+void CVideoOptions::Update(CTime elapsedTime)
+{
+    CGUIMenu::Update(elapsedTime);
+    
+    if (mFullscreenWidget->GetValue() != mLastFullscreenState)
+    {
+        if (mFullscreenWidget->GetValue())
+        {
+            mResolutionWidget->SetActive(false);
+            mResolutionWidget->SetCurrentIndex(mNativeResolutionIndex);
+        }
+        else
+        {
+            mResolutionWidget->SetActive(true);
+        }
+    }
+    mLastFullscreenState = mFullscreenWidget->GetValue();
 }
 
 void CVideoOptions::HandleSaveButton()
