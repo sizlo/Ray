@@ -13,5 +13,9 @@ CRayGame::CRayGame() : CGame("Ray v" RAY_VERSION_STRING)
 
 void CRayGame::InitialiseOptions()
 {
+    // Default to 4xAA
     GameOptions::antiAliasingLevel = 4;
+    
+    // Then perform any generic initialisation (reads config)
+    CGame::InitialiseOptions();
 }
