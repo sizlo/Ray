@@ -60,13 +60,11 @@ if (WIN32)
 	target_link_libraries(Ray Shlwapi.lib)
 
   # Copy resource files to exe folder
-  foreach(RES ${RESOURCE_FILES})
-    add_custom_command(
-      TARGET Ray POST_BUILD
-      COMMAND ${CMAKE_COMMAND} -E
-        copy_if_different ${RES} $<TARGET_FILE_DIR:Ray>
-    )
-  endforeach()
+  add_custom_command(
+    TARGET Ray POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E
+      copy_directory ${PROJECT_SOURCE_DIR}/Data $<TARGET_FILE_DIR:Ray>
+  )
 elseif(APPLE)
 	# Link Foundation.framework for finding bundle path
 	find_library(FOUNDATION_FRAMEWORK Foundation)
