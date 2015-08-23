@@ -36,6 +36,10 @@ void CLevelInterpreter::Parse(CLevel *theLevel)
         {
             theLevel->AddPlatform(GetPlatform(theNode));
         }
+        else if (strcmp(theNode.name(), "hazard") == 0)
+        {
+            theLevel->AddHazard(GetHazard(theNode));
+        }
         else
         {
             DEBUG_LOG("Unknown xml node: %s", theNode.name());
@@ -55,13 +59,23 @@ std::string CLevelInterpreter::GetLevelName()
 
 CPlatform * CLevelInterpreter::GetPlatform(pugi::xml_node theRoot)
 {
+    SLevelBlockInfo s = GetLevelBlockInfo(theRoot);
+    return new CPlatform(s.topLeft, s.width, s.height);
+}
+
+CHazard * CLevelInterpreter::GetHazard(pugi::xml_node theRoot)
+{
+    SLevelBlockInfo s = GetLevelBlockInfo(theRoot);
+    return new CHazard(s.topLeft, s.width, s.height);
+}
+
+SLevelBlockInfo CLevelInterpreter::GetLevelBlockInfo(pugi::xml_node theRoot)
+{
     CHECK_CHILD(theRoot, "position");
     CHECK_CHILD(theRoot, "width");
     CHECK_CHILD(theRoot, "height");
     
-    CVector2f position(-10.0f, -10.0f);
-    float width = 0.0f;
-    float height = 0.0f;
+    SLevelBlockInfo s;
     
     // Go through all children of the root and process each in turn
     for (pugi::xml_node theNode = theRoot.first_child();
@@ -70,15 +84,15 @@ CPlatform * CLevelInterpreter::GetPlatform(pugi::xml_node theRoot)
     {
         if (strcmp(theNode.name(), "position") == 0)
         {
-            position = GetVector2f(theNode);
+            s.topLeft = GetVector2f(theNode);
         }
         else if (strcmp(theNode.name(), "width") == 0)
         {
-            width = GetFloat(theNode);
+            s.width = GetFloat(theNode);
         }
         else if (strcmp(theNode.name(), "height") == 0)
         {
-            height = GetFloat(theNode);
+            s.height = GetFloat(theNode);
         }
         else
         {
@@ -86,5 +100,5 @@ CPlatform * CLevelInterpreter::GetPlatform(pugi::xml_node theRoot)
         }
     }
     
-    return new CPlatform(position, width, height);
+    return s;
 }

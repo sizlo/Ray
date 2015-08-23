@@ -15,6 +15,8 @@ public:
     
 private:
     CPlatform * GetPlatform(pugi::xml_node theRoot);
+    CHazard * GetHazard(pugi::xml_node theRoot);
+    SLevelBlockInfo GetLevelBlockInfo(pugi::xml_node theRoot);
 };
 
 #endif // __Ray__CLevelInterpreter__
