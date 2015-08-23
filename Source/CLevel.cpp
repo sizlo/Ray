@@ -89,6 +89,10 @@ bool CLevel::HandleMessage(CEvent e)
             }
             StartLevel();
         }
+        else if (e.key.code == CKeyboard::Escape)
+        {
+            CRayGame::Get()->PopGameLocation();
+        }
 #if TGL_DEBUG
         else if (e.key.code == CKeyboard::L)
         {
