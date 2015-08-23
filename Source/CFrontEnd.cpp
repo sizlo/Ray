@@ -2,6 +2,7 @@
 #include "GUIMenu/CButtonWidget.hpp"
 #include "CRayGame.hpp"
 #include "CLevelSelect.hpp"
+#include "CVideoOptions.hpp"
 
 CFrontEnd::CFrontEnd() : CGUIMenu()
 {
@@ -14,7 +15,7 @@ CFrontEnd::CFrontEnd() : CGUIMenu()
     
     AddWidget(new CButtonWidget(xPos, yPos, width, height, "Play", std::bind(&CFrontEnd::HandlePlayButton, this)));
     yPos += yOffset;
-    AddWidget(new CButtonWidget(xPos, yPos, width, height, "Options", std::bind(&CFrontEnd::HandleOptionsButton, this)));
+    AddWidget(new CButtonWidget(xPos, yPos, width, height, "Video Options", std::bind(&CFrontEnd::HandleVideoOptionsButton, this)));
     yPos += yOffset;
     AddWidget(new CButtonWidget(xPos, yPos, width, height, "Exit", std::bind(&CFrontEnd::HandleExitButton, this)));
     yPos += yOffset;
@@ -32,9 +33,10 @@ void CFrontEnd::HandlePlayButton()
     CRayGame::Get()->PushGameLocation(new CLevelSelect());
 }
 
-void CFrontEnd::HandleOptionsButton()
+void CFrontEnd::HandleVideoOptionsButton()
 {
-    DEBUG_LOG("Options button pressed");
+    DEBUG_LOG("Video Options button pressed");
+    CRayGame::Get()->PushGameLocation(new CVideoOptions());
 }
 
 void CFrontEnd::HandleExitButton()

@@ -10,7 +10,7 @@ public:
     ~CFrontEnd();
 private:
     void HandlePlayButton();
-    void HandleOptionsButton();
+    void HandleVideoOptionsButton();
     void HandleExitButton();
 };
 
