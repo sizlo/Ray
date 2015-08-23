@@ -5,7 +5,7 @@
 #include "SystemUtilities.hpp"
 #include "CLevelInterpreter.hpp"
 
-#if SG_WINDOWS
+#if TGL_WINDOWS
 #include "Libraries/dirent.h"
 #else
 #include <dirent.h>
