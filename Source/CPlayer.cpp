@@ -45,6 +45,7 @@ void CPlayer::Init(CVector2f startPos)
     mHSpeed = 0.0f;
     mVSpeed = 0.0f;
     mShape.setPosition(startPos);
+    mIsDead = false;
     
     mState = kGrounded;
     ResetJumps();
@@ -143,6 +144,16 @@ CVector2f CPlayer::GetMidPoint()
     return mid;
 }
 
+void CPlayer::Kill()
+{
+    mIsDead = true;
+}
+
+bool CPlayer::IsDead()
+{
+    return mIsDead;
+}
+
 void CPlayer::ReactToCollisionWith(CPlatform *platform, CVector2f cv)
 {
     // Seperate the player from the platform
@@ -171,6 +182,11 @@ void CPlayer::ReactToCollisionWith(CPlatform *platform, CVector2f cv)
         }
         mHSpeed = 0.0f;
     }
+}
+
+void CPlayer::ReactToCollisionWith(CHazard *hazard, CVector2f cv)
+{
+    Kill();
 }
 
 bool CPlayer::IsGroundBeneathUs()
@@ -256,6 +272,8 @@ void CPlayer::UpdateState()
 
 void CPlayer::TryStartJump()
 {
+    if (IsDead()) return;
+    
     if (mJumpsLeft > 0)
     {
         mJumpsLeft--;
@@ -314,11 +332,11 @@ void CPlayer::ResetJumps()
 void CPlayer::DoHorizontalMovement(CTime elapsedTime)
 {
     CVector2f direction(0.0f, 0.0f);
-    if (CKeyboard::isKeyPressed(CKeyboard::A))
+    if (!IsDead() && CKeyboard::isKeyPressed(CKeyboard::A))
     {
         direction += leftDir;
     }
-    if (CKeyboard::isKeyPressed(CKeyboard::D))
+    if (!IsDead() && CKeyboard::isKeyPressed(CKeyboard::D))
     {
         direction += rightDir;
     }
@@ -392,6 +410,8 @@ void CPlayer::DoVerticalMovement(CTime elapsedTime)
 
 void CPlayer::TryToDetach(CTime elapsedTime)
 {
+    if (IsDead()) return;
+    
     if ((mAttachedDirection == leftDir && CKeyboard::isKeyPressed(CKeyboard::D))
         || (mAttachedDirection == rightDir && CKeyboard::isKeyPressed(CKeyboard::A)))
     {

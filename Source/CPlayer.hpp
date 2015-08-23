@@ -5,6 +5,7 @@
 #include "CRenderable.hpp"
 #include "CMessageListener.hpp"
 #include "CPlatform.hpp"
+#include "CHazard.hpp"
 
 enum EPlayerState
 {
@@ -32,7 +33,11 @@ public:
     CVector2f GetPosition();
     CVector2f GetMidPoint();
     
+    void Kill();
+    bool IsDead();
+    
     void ReactToCollisionWith(CPlatform *platform, CVector2f cv);
+    void ReactToCollisionWith(CHazard *hazard, CVector2f cv);
     
 private:
     bool IsGroundBeneathUs();
@@ -59,6 +64,7 @@ private:
     float mWallSlideSpeed;
     CTime mDetachTime;
     CTime mCurrentDetachTimeCounter;
+    bool mIsDead;
 };
 
 #endif // __Ray__CPlayer__

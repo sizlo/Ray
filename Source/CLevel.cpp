@@ -16,8 +16,13 @@ CLevel::CLevel()
     mTorch = new CTorch(mPlayer);
     mSwitch = new CSwitch();
     
+    mDebugLightsOn = false;
+    
     mResetTooltip = CToolTip("Press R to reset the level", 100.0f);
     mResetTooltip.SetInfinite(true);
+    
+    mLevelWinToolTip = CToolTip("Level complete\nPress Esc to return to level select", 10.0f);
+    mLevelWinToolTip.SetInfinite(true);
 }
 
 CLevel::CLevel(std::string filename) : CLevel()
@@ -32,6 +37,7 @@ CLevel::CLevel(std::string filename) : CLevel()
 CLevel::~CLevel()
 {
     FREE_LIST_CONTENTS(mPlatforms);
+    FREE_LIST_CONTENTS(mHazards);
     SAFE_DELETE(mPlayer);
     SAFE_DELETE(mTorch);
     SAFE_DELETE(mSwitch);
@@ -73,16 +79,20 @@ bool CLevel::HandleMessage(CEvent e)
     {
         if (e.key.code == CKeyboard::R)
         {
-            if (PlayerIsOutOfBounds())
+            if (PlayerIsDead())
             {
                 mResetTooltip.SetState(kExiting);
+            }
+            if (mLightsOn)
+            {
+                mLevelWinToolTip.SetState(kExiting);
             }
             StartLevel();
         }
 #if TGL_DEBUG
         else if (e.key.code == CKeyboard::L)
         {
-            mLightsOn = !mLightsOn;
+            mDebugLightsOn = !mDebugLightsOn;
         }
 #endif
     }
@@ -99,23 +109,31 @@ void CLevel::StartLevel()
 
 void CLevel::Update(CTime elapsedTime)
 {
-    mPlayer->Update(elapsedTime);
+    if (!PlayerIsOutOfBounds())
+    {
+        mPlayer->Update(elapsedTime);
     
-    // Handle collisions before updating the torch so the player isn't inside a platform
-    HandleCollisions();
+        // Handle collisions before updating the torch so the player isn't inside a platform
+        HandleCollisions();
+        
+        mTorch->Update(elapsedTime);
+    }
     
-    mTorch->Update(elapsedTime);
-    
-    if (PlayerIsOutOfBounds())
+    if (PlayerIsDead())
     {
         if (mResetTooltip.IsDone() || mResetTooltip.IsExiting())
         {
             mResetTooltip.SetState(kEntering);
         }
     }
-    if (PlayerIsOutOfBounds() || mResetTooltip.IsExiting())
+    if (PlayerIsDead() || mResetTooltip.IsExiting())
     {
         mResetTooltip.Update(elapsedTime);
+    }
+    
+    if (mLightsOn || mLevelWinToolTip.IsExiting())
+    {
+        mLevelWinToolTip.Update(elapsedTime);
     }
 }
 
@@ -125,11 +143,15 @@ void CLevel::Draw(CWindow *theWindow)
     {
         p->Draw(theWindow);
     }
+    for (auto h: mHazards)
+    {
+        h->Draw(theWindow);
+    }
     
     mSwitch->Draw(theWindow);
     
     // Draw the darkness over the level but make sure the player and torch are visible
-    if (!mLightsOn)
+    if (!(mLightsOn || mDebugLightsOn))
     {
         mTorch->DrawDarkness(theWindow);
     }
@@ -138,11 +160,17 @@ void CLevel::Draw(CWindow *theWindow)
     mTorch->Draw(theWindow);
     
     mResetTooltip.Draw(theWindow);
+    mLevelWinToolTip.Draw(theWindow);
 }
 
 void CLevel::AddPlatform(CPlatform *p)
 {
     mPlatforms.push_back(p);
+}
+
+void CLevel::AddHazard(CHazard *h)
+{
+    mHazards.push_back(h);
 }
 
 std::list<CConvexShape> CLevel::GetOccluders()
@@ -172,6 +200,10 @@ void CLevel::SetSwitchPosition(CVector2f pos)
 
 void CLevel::TurnOnLights()
 {
+    if (!mLightsOn)
+    {
+        mLevelWinToolTip.SetState(kEntering);
+    }
     mLightsOn = true;
 }
 
@@ -190,6 +222,13 @@ void CLevel::HandleCollisions()
             mPlayer->ReactToCollisionWith(p, cv);
         }
     }
+    for (auto h: mHazards)
+    {
+        if (CollisionHandler::AreColliding(mPlayer->GetHitbox(), h->GetHitbox(), &cv))
+        {
+            mPlayer->ReactToCollisionWith(h, cv);
+        }
+    }
     
     if (CollisionHandler::AreColliding(mPlayer->GetHitbox(), mSwitch->GetHitbox(), &cv))
     {
@@ -197,8 +236,13 @@ void CLevel::HandleCollisions()
     }
 }
 
+bool CLevel::PlayerIsDead()
+{
+    return PlayerIsOutOfBounds() || mPlayer->IsDead();
+}
+
 bool CLevel::PlayerIsOutOfBounds()
 {
-    CFloatRect bounds(0.0f, 0.0f, GameOptions::viewWidth, GameOptions::viewHeight);
+    CFloatRect bounds(-GameOptions::viewWidth/2.0f, -GameOptions::viewHeight/2.0f, GameOptions::viewWidth * 2.0f, GameOptions::viewHeight * 2.0f);
     return !bounds.intersects(mPlayer->GetHitbox().getGlobalBounds());
 }

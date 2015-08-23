@@ -6,6 +6,7 @@
 #include "CGameLocation.hpp"
 #include "CMessageListener.hpp"
 #include "CPlatform.hpp"
+#include "CHazard.hpp"
 #include "CPlayer.hpp"
 #include "CTorch.hpp"
 #include "CSwitch.hpp"
@@ -31,6 +32,7 @@ public:
     bool HandleMessage(CEvent e);
     
     void AddPlatform(CPlatform *p);
+    void AddHazard(CHazard *h);
     std::list<CConvexShape> GetOccluders();
     std::list<CPlatform *> GetPlatforms();
     
@@ -43,16 +45,20 @@ public:
     
 private:
     void HandleCollisions();
+    bool PlayerIsDead();
     bool PlayerIsOutOfBounds();
     
     std::list<CPlatform *> mPlatforms;
+    std::list<CHazard *> mHazards;
     CPlayer *mPlayer;
     CVector2f mPlayerStartPos;
     CTorch *mTorch;
     CSwitch *mSwitch;
     CVector2f mSwitchPos;
     bool mLightsOn;
+    bool mDebugLightsOn;
     CToolTip mResetTooltip;
+    CToolTip mLevelWinToolTip;
     
     static CLevel *smCurrentLevel;
 };
