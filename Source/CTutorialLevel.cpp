@@ -34,8 +34,10 @@ CTutorialLevel::CTutorialLevel() : CLevel()
     SetSwitchPosition(CVector2f(GameOptions::viewWidth - wallWidth - (chuteWidth/2.0f), wallWidth + CGlobals::switchSize));
     
     mToolTips[0] = CToolTip("Move the mouse to aim the torch", 100.0f);
-    mToolTips[1] = CToolTip("Use keys A and D to move left and right", 100.0f);
-    mToolTips[2] = CToolTip("Press Space to jump", 100.0f);
+    mToolTips[1] = CToolTip("Use keys " + CGlobals::leftInput.AsString() +
+                            " and " + CGlobals::rightInput.AsString() +
+                            " to move left and right", 100.0f);
+    mToolTips[2] = CToolTip("Press " + CGlobals::jumpInput.AsString() + " to jump", 100.0f);
     mToolTips[3] = CToolTip("You can double jump and wall jump", 100.0f);
     mToolTips[4] = CToolTip("Turn on the lights to complete the level", 100.0f);
 }
