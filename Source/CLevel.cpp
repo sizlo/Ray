@@ -75,28 +75,33 @@ bool CLevel::HandleMessage(CEvent e)
 {
     bool messageEaten = false;
     
+    if (CGlobals::resetInput.WasPressedInEvent(e))
+    {
+        if (PlayerIsDead())
+        {
+            mResetTooltip.SetState(kExiting);
+        }
+        if (mLightsOn)
+        {
+            mLevelWinToolTip.SetState(kExiting);
+        }
+        StartLevel();
+        
+        messageEaten = true;
+    }
+    
     if (e.type == CEvent::KeyPressed)
     {
-        if (e.key.code == CKeyboard::R)
-        {
-            if (PlayerIsDead())
-            {
-                mResetTooltip.SetState(kExiting);
-            }
-            if (mLightsOn)
-            {
-                mLevelWinToolTip.SetState(kExiting);
-            }
-            StartLevel();
-        }
-        else if (e.key.code == CKeyboard::Escape)
+        if (e.key.code == CKeyboard::Escape)
         {
             CRayGame::Get()->PopGameLocation();
+            messageEaten = true;
         }
 #if TGL_DEBUG
         else if (e.key.code == CKeyboard::L)
         {
             mDebugLightsOn = !mDebugLightsOn;
+            messageEaten = true;
         }
 #endif
     }

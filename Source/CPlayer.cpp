@@ -107,21 +107,23 @@ bool CPlayer::HandleMessage(CEvent e)
 {
     bool messageEaten = false;
     
+    if (CGlobals::jumpInput.WasPressedInEvent(e))
+    {
+        messageEaten = true;
+        TryStartJump();
+    }
+    
+#if TGL_DEBUG
     if (e.type == CEvent::KeyPressed)
     {
-        if (e.key.code == CKeyboard::Space)
+        if (e.key.code == CKeyboard::LShift)
         {
             messageEaten = true;
-            TryStartJump();
-        }
-#if TGL_DEBUG
-        else if (e.key.code == CKeyboard::LShift)
-        {
             CVector2f newPos = SystemUtilities::GetMousePosition();
             Init(newPos);
         }
-#endif
     }
+#endif
     
     return messageEaten;
 }
@@ -292,18 +294,18 @@ void CPlayer::TryStartJump()
                 break;
             case kInAir: // If we're in the air use the current input direction to decide which way to jump
                 direction = upDir;
-                if (CKeyboard::isKeyPressed(CKeyboard::A) && CKeyboard::isKeyPressed(CKeyboard::D))
+                if (CGlobals::leftInput.IsPressed() && CGlobals::rightInput.IsPressed())
                 {
                     direction = upDir;
                     mVSpeed = mInitialJumpSpeed * direction.y;
                 }
-                else if (CKeyboard::isKeyPressed(CKeyboard::A))
+                else if (CGlobals::leftInput.IsPressed())
                 {
                     direction = upDir + leftDir;
                     mVSpeed = mInitialJumpSpeed * direction.y;
                     mHSpeed = mInitialJumpSpeed * direction.x;
                 }
-                else if (CKeyboard::isKeyPressed(CKeyboard::D))
+                else if (CGlobals::rightInput.IsPressed())
                 {
                     direction = upDir + rightDir;
                     mVSpeed = mInitialJumpSpeed * direction.y;
@@ -343,11 +345,11 @@ void CPlayer::ResetJumps()
 void CPlayer::DoHorizontalMovement(CTime elapsedTime)
 {
     CVector2f direction(0.0f, 0.0f);
-    if (!IsDead() && CKeyboard::isKeyPressed(CKeyboard::A))
+    if (!IsDead() && CGlobals::leftInput.IsPressed())
     {
         direction += leftDir;
     }
-    if (!IsDead() && CKeyboard::isKeyPressed(CKeyboard::D))
+    if (!IsDead() && CGlobals::rightInput.IsPressed())
     {
         direction += rightDir;
     }
@@ -423,8 +425,8 @@ void CPlayer::TryToDetach(CTime elapsedTime)
 {
     if (IsDead()) return;
     
-    if ((mAttachedDirection == leftDir && CKeyboard::isKeyPressed(CKeyboard::D))
-        || (mAttachedDirection == rightDir && CKeyboard::isKeyPressed(CKeyboard::A)))
+    if ((mAttachedDirection == leftDir && CGlobals::rightInput.IsPressed())
+        || (mAttachedDirection == rightDir && CGlobals::leftInput.IsPressed()))
     {
         mCurrentDetachTimeCounter += elapsedTime;
         if (mCurrentDetachTimeCounter >= mDetachTime)
