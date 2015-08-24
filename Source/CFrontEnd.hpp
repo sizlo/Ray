@@ -11,6 +11,7 @@ public:
 private:
     void HandlePlayButton();
     void HandleVideoOptionsButton();
+    void HandleInputOptionsButton();
     void HandleExitButton();
 };
 
