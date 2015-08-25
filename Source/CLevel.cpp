@@ -18,7 +18,7 @@ CLevel::CLevel()
     
     mDebugLightsOn = false;
     
-    mResetTooltip = CToolTip("Press R to reset the level", 100.0f);
+    mResetTooltip = CToolTip("Press " + CGlobals::resetInput.AsString() + " to reset the level", 100.0f);
     mResetTooltip.SetInfinite(true);
     
     mLevelWinToolTip = CToolTip("Ray turned on the lights\nPress Esc to return to level select", 10.0f);
@@ -149,7 +149,7 @@ void CLevel::Update(CTime elapsedTime)
     
     if (!playerWasDead && mPlayer->IsDead())
     {
-        mResetTooltip.SetText("Ray " + mPlayer->GetDeathReason() + "\nPress R to reset level");
+        mResetTooltip.SetText("Ray " + mPlayer->GetDeathReason() + "\nPress " + CGlobals::resetInput.AsString() + " to reset level");
     }
 }
 
