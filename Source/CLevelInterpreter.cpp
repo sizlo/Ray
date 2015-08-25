@@ -36,6 +36,10 @@ void CLevelInterpreter::Parse(CLevel *theLevel)
         {
             theLevel->AddPlatform(GetPlatform(theNode));
         }
+        else if (strcmp(theNode.name(), "movingPlatform") == 0)
+        {
+            theLevel->AddPlatform(GetMovingPlatform(theNode));
+        }
         else if (strcmp(theNode.name(), "hazard") == 0)
         {
             theLevel->AddHazard(GetHazard(theNode));
@@ -61,6 +65,56 @@ CPlatform * CLevelInterpreter::GetPlatform(pugi::xml_node theRoot)
 {
     SLevelBlockInfo s = GetLevelBlockInfo(theRoot);
     return new CPlatform(s.topLeft, s.width, s.height);
+}
+
+CMovingPlatform * CLevelInterpreter::GetMovingPlatform(pugi::xml_node theRoot)
+{
+    CHECK_CHILD(theRoot, "startX");
+    CHECK_CHILD(theRoot, "endX");
+    CHECK_CHILD(theRoot, "period");
+    
+    float startX;
+    float endX;
+    CTime period;
+    
+    SLevelBlockInfo s;
+    
+    // Go through all children of the root and process each in turn
+    for (pugi::xml_node theNode = theRoot.first_child();
+         theNode;
+         theNode = theNode.next_sibling())
+    {
+        if (strcmp(theNode.name(), "startX") == 0)
+        {
+            startX = GetFloat(theNode);
+        }
+        else if (strcmp(theNode.name(), "endX") == 0)
+        {
+            endX = GetFloat(theNode);
+        }
+        else if (strcmp(theNode.name(), "period") == 0)
+        {
+            period = GetTime(theNode);
+        }
+        else if (strcmp(theNode.name(), "position") == 0)
+        {
+            s.topLeft = GetVector2f(theNode);
+        }
+        else if (strcmp(theNode.name(), "width") == 0)
+        {
+            s.width = GetFloat(theNode);
+        }
+        else if (strcmp(theNode.name(), "height") == 0)
+        {
+            s.height = GetFloat(theNode);
+        }
+        else
+        {
+            DEBUG_LOG("Unknown xml node: %s", theNode.name());
+        }
+    }
+    
+    return new CMovingPlatform(s.topLeft, s.width, s.height, startX, endX, period);
 }
 
 CHazard * CLevelInterpreter::GetHazard(pugi::xml_node theRoot)

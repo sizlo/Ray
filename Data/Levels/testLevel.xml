@@ -91,4 +91,16 @@
         <height>100</height>
     </hazard>
 
+    <movingPlatform>
+        <position>
+            <x>1000</x>
+            <y>200</y>
+        </position>
+        <width>100</width>
+        <height>25</height>
+        <startX>1000</startX>
+        <endX>1800</endX>
+        <period>3.0</period>
+    </movingPlatform>
+
 </level>

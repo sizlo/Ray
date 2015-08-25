@@ -146,6 +146,11 @@ CVector2f CPlayer::GetMidPoint()
     return mid;
 }
 
+void CPlayer::Move(CVector2f offset)
+{
+    mShape.move(offset);
+}
+
 void CPlayer::Kill(std::string reason)
 {
     mDeathReason = reason;
@@ -168,7 +173,7 @@ void CPlayer::ReactToCollisionWith(CPlatform *platform, CVector2f cv)
     CollisionHandler::Seperate(mShape, platform->GetHitbox(), cv, kCRMoveLeft);
     
     CVector2f direction = cv.GetDirection();
-    if (direction == upDir) // Collided with ground
+    if (direction == upDir && mVSpeed > 0.0f) // Collided with ground
     {
         ResetJumps();
         mState = kGrounded;

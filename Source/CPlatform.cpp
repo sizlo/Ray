@@ -10,3 +10,8 @@ CPlatform::~CPlatform()
 {
     
 }
+
+void CPlatform::Update(CTime elapsedTime)
+{
+    // Do nothing
+}

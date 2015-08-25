@@ -120,6 +120,11 @@ void CLevel::Update(CTime elapsedTime)
 {
     bool playerWasDead = mPlayer->IsDead();
     
+    for (auto p: mPlatforms)
+    {
+        p->Update(elapsedTime);
+    }
+    
     if (!PlayerIsOutOfBounds())
     {
         mPlayer->Update(elapsedTime);
@@ -236,6 +241,7 @@ void CLevel::HandleCollisions()
         if (CollisionHandler::AreColliding(mPlayer->GetHitbox(), p->GetHitbox(), &cv))
         {
             mPlayer->ReactToCollisionWith(p, cv);
+            p->ReactToCollisionWith(mPlayer, cv);
         }
     }
     for (auto h: mHazards)
@@ -243,6 +249,7 @@ void CLevel::HandleCollisions()
         if (CollisionHandler::AreColliding(mPlayer->GetHitbox(), h->GetHitbox(), &cv))
         {
             mPlayer->ReactToCollisionWith(h, cv);
+            h->ReactToCollisionWith(mPlayer, cv);
         }
     }
     

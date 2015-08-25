@@ -10,6 +10,8 @@ struct SLevelBlockInfo
     float height;
 };
 
+class CPlayer;
+
 class CLevelBlock : public CRenderable
 {
 public:
@@ -18,7 +20,10 @@ public:
     
     void Draw(CWindow *theWindow);
     
-    CConvexShape & GetHitbox();
+    CConvexShape & GetHitbox();    
+    CVector2f GetPosition();
+    
+    virtual void ReactToCollisionWith(CPlayer *player, CVector2f cv);
     
 private:
     CConvexShape mShape;

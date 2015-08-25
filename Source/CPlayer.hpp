@@ -33,6 +33,8 @@ public:
     CVector2f GetPosition();
     CVector2f GetMidPoint();
     
+    void Move(CVector2f offset);
+    
     void Kill(std::string reason);
     bool IsDead();
     std::string GetDeathReason();

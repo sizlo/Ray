@@ -3,6 +3,7 @@
 
 #include "CXMLInterpreter.hpp"
 #include "CLevel.hpp"
+#include "CMovingPlatform.hpp"
 
 class CLevelInterpreter : public CXMLInterpreter
 {
@@ -15,6 +16,7 @@ public:
     
 private:
     CPlatform * GetPlatform(pugi::xml_node theRoot);
+    CMovingPlatform * GetMovingPlatform(pugi::xml_node theRoot);
     CHazard * GetHazard(pugi::xml_node theRoot);
     SLevelBlockInfo GetLevelBlockInfo(pugi::xml_node theRoot);
 };
