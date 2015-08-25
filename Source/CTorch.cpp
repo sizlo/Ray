@@ -91,17 +91,19 @@ std::list<CConvexShape> CTorch::GenerateDarkness(CWindow *theWindow)
     
     // Create boundary shapes from the first and final rays
     CRay first = rays.front();
-    CConvexShape leftBoundaryShape(3);
+    CConvexShape leftBoundaryShape(4);
     leftBoundaryShape.setPoint(0, first.GetOrigin());
-    leftBoundaryShape.setPoint(1, first.GetEnd());
-    leftBoundaryShape.setPoint(2, first.GetOrigin() - (mLightDirection * first.GetLength()));
+    leftBoundaryShape.setPoint(1, first.GetClosestIntersection(occluders));
+    leftBoundaryShape.setPoint(2, first.GetEnd());
+    leftBoundaryShape.setPoint(3, first.GetOrigin() - (mLightDirection * first.GetLength()));
     darknessShapes.push_back(leftBoundaryShape);
     
     CRay last = rays.back();
-    CConvexShape rightBoundaryShape(3);
+    CConvexShape rightBoundaryShape(4);
     rightBoundaryShape.setPoint(0, last.GetOrigin());
-    rightBoundaryShape.setPoint(1, last.GetEnd());
-    rightBoundaryShape.setPoint(2, last.GetOrigin() - (mLightDirection * last.GetLength()));
+    rightBoundaryShape.setPoint(1, last.GetClosestIntersection(occluders));
+    rightBoundaryShape.setPoint(2, last.GetEnd());
+    rightBoundaryShape.setPoint(3, last.GetOrigin() - (mLightDirection * last.GetLength()));
     darknessShapes.push_back(rightBoundaryShape);
     
     return darknessShapes;
