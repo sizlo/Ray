@@ -120,14 +120,14 @@ void CLevel::Update(CTime elapsedTime)
 {
     bool playerWasDead = mPlayer->IsDead();
     
-    for (auto p: mPlatforms)
-    {
-        p->Update(elapsedTime);
-    }
-    
     if (!PlayerIsOutOfBounds())
     {
         mPlayer->Update(elapsedTime);
+        
+        for (auto p: mPlatforms)
+        {
+            p->Update(elapsedTime);
+        }
     
         // Handle collisions before updating the torch so the player isn't inside a platform
         HandleCollisions();
