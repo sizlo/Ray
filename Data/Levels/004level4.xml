@@ -1,0 +1,104 @@
+<level name="Level 4">
+    
+    <playerStartPos>
+        <x>100</x>
+        <y>980</y>
+    </playerStartPos>
+    
+    <switchPos>
+        <x>1795</x>
+        <y>40</y>
+    </switchPos>
+
+    <!-- Walls -->
+    <platform>
+        <position>
+            <x>0</x>
+            <y>0</y>
+        </position>
+        <width>50</width>
+        <height>1080</height>
+    </platform>
+
+    <!-- Start platform -->
+    <platform>
+        <position>
+            <x>0</x>
+            <y>1030</y>
+        </position>
+        <width>200</width>
+        <height>50</height>
+    </platform>
+
+    <!-- The floor is lava -->
+    <hazard>
+        <position>
+            <x>200</x>
+            <y>1030</y>
+        </position>
+        <width>1720</width>
+        <height>50</height>
+    </hazard>
+
+    <!-- Moving platforms -->
+    <movingPlatform>
+        <position>
+            <x>200</x>
+            <y>880</y>
+        </position>
+        <width>100</width>
+        <height>25</height>
+        <startX>200</startX>
+        <endX>1620</endX>
+        <period>3.0</period>
+    </movingPlatform>
+
+    <movingPlatform>
+        <position>
+            <x>200</x>
+            <y>680</y>
+        </position>
+        <width>100</width>
+        <height>25</height>
+        <startX>200</startX>
+        <endX>1620</endX>
+        <period>3.0</period>
+    </movingPlatform>
+
+    <movingPlatform>
+        <position>
+            <x>200</x>
+            <y>480</y>
+        </position>
+        <width>100</width>
+        <height>25</height>
+        <startX>200</startX>
+        <endX>1620</endX>
+        <period>3.0</period>
+    </movingPlatform>
+
+    <movingPlatform>
+        <position>
+            <x>200</x>
+            <y>280</y>
+        </position>
+        <width>100</width>
+        <height>25</height>
+        <startX>200</startX>
+        <endX>1620</endX>
+        <period>3.0</period>
+    </movingPlatform>
+
+    <movingPlatform>
+        <position>
+            <x>200</x>
+            <y>80</y>
+        </position>
+        <width>100</width>
+        <height>25</height>
+        <startX>200</startX>
+        <endX>1620</endX>
+        <period>3.0</period>
+    </movingPlatform>
+    
+</level>
