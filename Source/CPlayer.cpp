@@ -181,7 +181,8 @@ void CPlayer::ReactToCollisionWith(CPlatform *platform, CVector2f cv)
     }
     else if (direction == downDir) // Collided with roof
     {
-        mVSpeed = 0.0f;
+		// If we somehow hit a roof but are travelling downwards ignore the collision
+		mVSpeed = std::max(0.0f, mVSpeed);
     }
     else if (direction == leftDir || direction == rightDir) // Collided with wall
     {
