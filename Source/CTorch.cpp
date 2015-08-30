@@ -58,7 +58,11 @@ std::list<CConvexShape> CTorch::GenerateDarkness(CWindow *theWindow)
     CVector2f lightOrigin = mShape.getPosition() + (mLightDirection * mTorchLength);
     CVector2f direction = mLightDirection;
     direction.Rotate(-mLightRadius / 2.0f);
+#if TGL_DEBUG && TGL_WINDOWS // For some reason this tanks debug builds on windows
+	int iterations = 10;
+#else
     int iterations = 200;
+#endif
     float rotation = mLightRadius / (iterations - 1);
     std::list<CRay> rays;
     for (int i = 0; i < iterations; i++)
