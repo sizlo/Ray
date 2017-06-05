@@ -10,7 +10,8 @@ public:
     static float playerSize;
     static float switchSize;
     static CVector2f gravity;
-    
+	static float torchRadius;
+	
     static CInput leftInput;
     static CInput rightInput;
     static CInput jumpInput;

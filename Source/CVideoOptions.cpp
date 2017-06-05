@@ -1,6 +1,7 @@
 #include "CVideoOptions.hpp"
 #include "GUIMenu/CButtonWidget.hpp"
 #include "CRayGame.hpp"
+#include "CGlobals.hpp"
 #include <math.h>
 
 CVideoOptions::CVideoOptions() : CGUIMenu()
@@ -21,6 +22,9 @@ CVideoOptions::CVideoOptions() : CGUIMenu()
     mPreserveAspectWidget = new CToggleWidget(mXPos, mYPos, mWidgetWidth, mWidgetHeight, "Preserve Aspect Ratio", GameOptions::preserveAspect);
     AddWidget(mPreserveAspectWidget);
     mYPos += mYOffset;
+	mTorchRadiusWidget = new CSliderWidget(mXPos, mYPos, mWidgetWidth, mWidgetHeight, "Torch Radius", 0, 360, 10, CGlobals::torchRadius);
+	AddWidget(mTorchRadiusWidget);
+	mYPos += mYOffset;
     
     int aaIndex;
     switch (GameOptions::antiAliasingLevel)
@@ -120,7 +124,12 @@ void CVideoOptions::HandleSaveButton()
         GameOptions::preserveAspect = mPreserveAspectWidget->GetValue();
         optionsChanged = true;
     }
-    
+	if (mTorchRadiusWidget->GetValue() != CGlobals::torchRadius)
+	{
+		CGlobals::torchRadius = mTorchRadiusWidget->GetValue();
+		optionsChanged = true;
+	}
+		
     int aaIndex = mAAWidget->GetCurrentIndex();
     int aaLevel;
     switch (aaIndex)

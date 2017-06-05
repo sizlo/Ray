@@ -4,6 +4,7 @@
 #include "GUIMenu/CGUIMenu.hpp"
 #include "GUIMenu/CToggleWidget.hpp"
 #include "GUIMenu/CPickerWidget.hpp"
+#include "GUIMenu/CSliderWidget.hpp"
 
 class CVideoOptions : public CGUIMenu
 {
@@ -23,6 +24,7 @@ private:
     CToggleWidget *mPreserveAspectWidget;
     CPickerWidget *mAAWidget;
     CPickerWidget *mResolutionWidget;
+	CSliderWidget *mTorchRadiusWidget;
     
     bool mLastFullscreenState;
     int mNativeResolutionIndex;

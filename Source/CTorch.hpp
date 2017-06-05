@@ -24,7 +24,6 @@ private:
     CPlayer *mHolder;
     CVector2f mLightDirection;
     float mTorchLength;
-    float mLightRadius;
 };
 
 #endif // __Ray__CTorch__
