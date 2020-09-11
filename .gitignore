@@ -1,0 +1,7 @@
+CMakeCache.txt
+CMakeFiles/
+Makefile
+*.app
+*.cmake
+cotire/
+*.a
